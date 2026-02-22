@@ -1,0 +1,346 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><style>
+.rw{padding:3px 8px 3px 0;vertical-align:top;color:#2d3748;font-weight:600;font-size:12px}
+.re{padding:3px 8px 3px 0;vertical-align:top;color:#e53e3e;font-weight:600;font-size:12px}
+.ac{background:#fff;border:1px solid #e2e8f0;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:14px;font-size:13px;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.ab{background:#fff8f0;border-left:4px solid #ed8936;padding:12px;margin-bottom:10px;border-radius:0 6px 6px 0;font-size:13px}
+.ay{background:#fffbeb;border-left:4px solid #ecc94b;padding:12px;margin-bottom:10px;border-radius:0 6px 6px 0;font-size:13px}
+.az{background:#ebf8ff;border-left:4px solid #3182ce;padding:12px;margin-bottom:10px;border-radius:0 6px 6px 0;font-size:13px}
+.vc{background:#fff;border:1px solid #dee2e6;border-radius:6px;padding:16px;margin-bottom:16px}
+.gp{background:rgba(255,255,255,0.1);padding:10px;border-radius:6px;font-size:12px}
+.tc{text-align:center}.tg{text-align:center;color:#38a169}.tr{text-align:center;color:#e53e3e}.ty{text-align:center;color:#fbd38d}
+.si{font-size:13px;color:#4a5568;line-height:1.6;margin:0 0 14px;padding:10px 14px;background:#f7fafc;border-radius:6px;border-left:3px solid #cbd5e0}
+@media print{body{background:#fff!important;font-size:11px}.ac{break-inside:avoid;box-shadow:none;border:1px solid #ccc}#header,.btn{display:none!important}.card{break-inside:avoid;box-shadow:none!important}}
+</style></head>
+<body style='background:#f8f9fa;margin:0;padding:0;font-family:sans-serif;'>
+<div id='header' style='background:#1a237e;color:white;padding:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.2);'>
+<div><h1 style='margin:0;font-size:24px;'>Fleet Cost Optimizer <small style='font-size:12px;opacity:0.6;'>v2.0</small></h1>
+<p style='margin:0;opacity:0.8;font-size:14px;'>Executive Fleet Intelligence Report</p></div>
+<div><button id='run-btn' style='background:#28a745;color:white;border:none;padding:10px 25px;border-radius:4px;font-weight:bold;cursor:pointer;'>Run Audit</button>
+<button id='debug-btn' style='background:transparent;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.2);padding:10px 15px;border-radius:4px;cursor:pointer;font-size:11px;margin-left:8px;display:none;'>Debug</button></div></div>
+<div id='main-container' class='container-fluid p-4' style='max-width:1200px;margin:auto;'>
+<div id='status-msg' style='display:none;' class='alert alert-info'><span id='status-text'>Analyzing...</span></div>
+<div id='results-content' style='display:none;'>
+<div id='exec-summary-anchor'></div><div id='sustainability-anchor'></div><div id='monthly-trend-anchor'></div>
+<div class='card mb-4 shadow-sm text-center'><div class='card-body'>
+<h5 class='text-muted text-uppercase small'>Total Optimization Opportunity (Current Month)</h5>
+<h1 id='total-waste-text' style='color:#dc3545;font-weight:bold;font-size:48px;margin:10px 0;'>$0 CAD</h1>
+<p id='annual-text' class='text-secondary mb-1'></p></div></div>
+<div class='si'>📊 <b>What We Found:</b> <span id='fleet-size-text'>50</span> vehicles analyzed over <span id='data-span-text'>22</span> days. Four categories of recoverable cost below, ranked by impact. Each links to a specific action in the Roadmap.</div>
+<div class='row' id='findings-grid'></div><div id='action-plan-anchor'></div>
+<div id='evidence-report' style='display:none;'></div>
+<div class='mt-4'><button class='btn btn-outline-secondary btn-sm w-100' type='button' data-bs-toggle='collapse' data-bs-target='#methodBox'>Methodology &amp; Sources</button></div>
+<div class='collapse mt-2' id='methodBox'><div class='card card-body small text-muted'>
+<p><b>Costs:</b> Ghost=$800/mo (lease+ins). Idle=$4.30/hr (3.5L/hr×$1.23/L). Risk=2×avg events. Breakdown=3+ mech faults.</p>
+<p><b>Benchmarks:</b> Idle &lt;15% (NRCan). Safety 20-40 events/vehicle/yr. Lease $800/mo (DesRosiers 2025). Idle fuel 2.5-4.0 L/hr (NRCan), using 3.5. CO₂ 2.68kg/L diesel (ECCC). Proactive $400 vs breakdown $1,200-$3,500 (CAA).</p>
+<p><b>Regulatory:</b> Clean Fuel Regs (SOR/2022-140). OBPS under GGPPA. Net-Zero Accountability Act (S.C. 2021, c.22). NRCan FleetSmart. ISSB S2 via CSA.</p>
+</div></div></div></div>
+<script>
+window.onerror=function(m,s,l,c,e){var el=document.getElementById('status-msg');if(el){el.style.display='block';document.getElementById('status-text').textContent='JS Error: '+m+' (line '+l+')';document.getElementById('status-text').style.color='red'}return false};
+var link=document.createElement('link');link.rel='stylesheet';link.href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css';document.head.appendChild(link);
+var scr=document.createElement('script');scr.src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js';document.head.appendChild(scr);
+function pD(d){if(!d)return 0;var days=0,tp=d;if(d.indexOf('.')>-1){var p=d.split('.');days=parseInt(p[0])||0;tp=p[1]}var t=tp.split(':');return(days*24)+(parseInt(t[0])||0)+(parseInt(t[1])||0)/60+(parseInt(t[2])||0)/3600}
+function fD(d){var h=pD(d);if(h>720)return'ongoing';if(h<.01)return'0m';var m=Math.round(h*60),hr=Math.floor(m/60),mn=m%60;return hr>0?hr+'h '+mn+'m':mn+'m'}
+function fC(n){return Math.round(n).toLocaleString()+' CAD'}
+function cD(s){return s.replace('Diagnostic','').replace('Id','').replace(/([A-Z])/g,' $1').trim()}
+function mL(ym){var p=ym.split('-'),mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mn[parseInt(p[1])-1]+' '+p[0].substring(2)}
+function sOf(m){return(m>=11||m<=2)?'winter':(m>=3&&m<=5)?'spring':(m>=6&&m<=8)?'summer':'fall'}
+function isN(n){return n.indexOf('accelerometer')>-1||n.indexOf('disabled')>-1||n.indexOf('telematics')>-1||n.indexOf('accident')>-1||n.indexOf('collision')>-1}
+function sC(s){return s==='winter'?'#3182ce':s==='spring'?'#38a169':s==='summer'?'#d69e2e':'#dd6b20'}
+function sI(s){return s==='winter'?'❄️':s==='spring'?'🌱':s==='summer'?'☀️':'🍂'}
+var _dd={};
+geotab.addin['fleet-waste-finder']=function(){return{initialize:function(api,s,cb){
+document.getElementById('run-btn').onclick=function(){runAudit(api)};
+var db=document.getElementById('debug-btn');db.style.display='inline-block';
+db.onclick=function(){var d=_dd;if(!d.dv){alert('Run audit first.');return}
+var o='=== FCO v2.0 ===\nDev:'+d.dv+' Tr:'+d.tr+' Exc:'+d.ex+' Fl:'+d.fl+'\nSpan:'+d.sp+'d Mo:'+d.mo+'\nIdle:'+d.ih.toFixed(1)+'h Dr:'+d.dh.toFixed(1)+'h Rate:'+d.ir.toFixed(1)+'%\nGh:'+d.gh+' Id:'+d.ic+' Rk:'+d.hr+' Mt:'+d.mt+' $:'+d.tw+'\n';
+if(d.mk)d.mk.forEach(function(k){o+=k+':idle='+d.mi[k].toFixed(1)+'h\n'});
+var w=window.open('','_blank','width=600,height=400');w.document.write('<pre style="font-size:12px;padding:20px">'+o+'</pre>')};cb()}}};
+function runAudit(api){
+var st=document.getElementById('status-msg'),tx=document.getElementById('status-text'),rb=document.getElementById('run-btn');
+st.style.display='block';rb.disabled=true;tx.style.color='';tx.textContent='Pulling 12 months of data...';
+var d365=new Date();d365.setDate(d365.getDate()-365);
+api.multiCall([['Get',{typeName:'Device'}],['Get',{typeName:'Trip',search:{fromDate:d365.toISOString()}}],['Get',{typeName:'ExceptionEvent',search:{fromDate:d365.toISOString()}}],['Get',{typeName:'Rule'}],['Get',{typeName:'FaultData',search:{fromDate:d365.toISOString()}}]],function(r){
+tx.textContent='Processing '+r[1].length+' trips...';
+setTimeout(function(){try{proc(r[0],r[1],r[2],r[3],r[4]);st.style.display='none';rb.disabled=false;document.getElementById('results-content').style.display='block'}catch(err){rb.disabled=false;tx.textContent='ERROR: '+err.message;tx.style.color='red';console.error(err)}},50)},function(e){rb.disabled=false;tx.textContent='API Error: '+e;tx.style.color='red'})}
+function proc(devs,trips,exs,rules,faults){
+var dm={},ear=new Date(),rm={},ni={};
+rules.forEach(function(r){rm[r.id]=r.name});
+devs.forEach(function(d){ni[d.name]=d.id;dm[d.id]={id:d.id,nm:d.name,ft:null,ad:{},ih:0,dh:0,ec:0,mf:[],af:[],tr:[],ex:[],dk:0}});
+var ms={};
+trips.forEach(function(t){var d=dm[t.device.id];if(!d)return;var dt=new Date(t.start);
+d.tr.push(t);if(!d.ft||dt<d.ft)d.ft=dt;if(dt<ear)ear=dt;
+d.ad[t.start.substring(0,10)]=true;
+var ih=pD(t.idlingDuration),dh=pD(t.drivingDuration);d.ih+=ih;d.dh+=dh;
+if(t.distance)d.dk+=t.distance;
+var ym=t.start.substring(0,7);if(!ms[ym])ms[ym]={idle:0,drv:0,trips:0,co2:0,devs:{}};
+ms[ym].idle+=ih;ms[ym].drv+=dh;ms[ym].trips++;ms[ym].co2+=ih*3.5*2.68;ms[ym].devs[t.device.id]=true});
+var now=new Date(),span=Math.floor((now-ear)/864e5)||1,isE=true;
+devs.forEach(function(d){var s=dm[d.id];if(s.dk>0)isE=false;var uk=s.dk>0?s.dk:((s.dh||0)*40);s.ek=uk;s.dkm=span>0?(uk/span):0});
+exs.forEach(function(e){var d=dm[e.device.id];if(d){d.ex.push(e);d.ec++}});
+faults.forEach(function(f){var d=dm[f.device&&f.device.id];if(!d)return;var di=f.diagnostic&&f.diagnostic.id;if(!di||typeof di!=='string')return;d.af.push(f);var n=di;if((/(Warning|Malfunction|Fault|Engine)/i.test(n)||f.amberWarningLamp)&&!/Disabled|Accelerometer/i.test(n))d.mf.push(f)});
+var gh=[],idl=[],sf=[],mt=[],tE=0,tI=0,tD=0;
+devs.forEach(function(d){var s=dm[d.id];tI+=s.ih;tD+=s.dh;
+if(s.ft){var age=Math.floor((now-s.ft)/864e5)||1,ut=(Object.keys(s.ad).length/age)*100;
+if(ut<40){var an=s.ek*(365/span),cp=an>0?(12000/an):0;gh.push({nm:s.nm,val:ut.toFixed(0)+'%',w:800,dist:s.ek,cp:cp})}}
+if(s.ih>0)idl.push({nm:s.nm,hrs:s.ih,val:s.ih.toFixed(1)+' hrs',w:s.ih*4.3});tE+=s.ec});
+var aE=devs.length>0?tE/devs.length:0;
+devs.forEach(function(d){var s=dm[d.id],tA=aE>0?(s.ec/aE):0;
+if(tA>=2){var ct={},mx=0,tp="None";s.ex.forEach(function(e){var r=rm[e.rule.id]||"Event";ct[r]=(ct[r]||0)+1;if(ct[r]>mx){mx=ct[r];tp=r}});
+sf.push({nm:s.nm,val:s.ec,avg:tA.toFixed(1),ta:tA,w:200,dt:tp,tc:ct})}
+if(s.mf.length>=3)mt.push({nm:s.nm,val:s.mf.length,w:800})});
+var gC=gh.length*800,tpI=idl.sort(function(a,b){return b.hrs-a.hrs}).slice(0,10);
+var tpH=tpI.reduce(function(a,b){return a+b.hrs},0),iC=tpI.reduce(function(a,b){return a+b.w},0);
+var rC=sf.length*200,mC=mt.length*800,tW=gC+iC+rC+mC;
+var tO=tI+tD,iR=tO>0?((tI/tO)*100):0;
+var mc=0,dc=0;sf.forEach(function(h){var d=(h.dt||'').toLowerCase(),dev=dm[ni[h.nm]];
+var isDevNoise=false;
+try{if(dev&&dev.mf.length===0&&dev.af&&dev.af.length>0){var realF=dev.af.filter(function(f){var n=String(f&&f.diagnostic&&f.diagnostic.id||'').toLowerCase();return !isN(n)});isDevNoise=realF.length===0}}catch(e){console.warn('DevNoise check err:',e)}
+if(d.indexOf('engine')>-1||d.indexOf('fault')>-1||d.indexOf('light')>-1){if(isDevNoise){dc++;h._devNoise=true}else{mc++}}});
+var dnX=[];devs.forEach(function(d){var s=dm[d.id];if(!s.af||s.af.length<5)return;var inSf=false;sf.forEach(function(h){if(h.nm===s.nm)inSf=true});if(inSf)return;var nF=s.af.filter(function(f){var n=String(f&&f.diagnostic&&f.diagnostic.id||'').toLowerCase();return isN(n)});if(nF.length>0&&nF.length===s.af.length){dc++;dnX.push({nm:s.nm,val:nF.length+' noise records',avg:'n/a',ta:0,w:0,dt:'Device Noise',tc:{},_devNoise:true,_extraDN:true})}});
+var co2=tI*3.5*2.68;
+var mk=Object.keys(ms).sort(),mCt=mk.length;
+/* Debug */
+var ti={h:[],n:[],l:[],v:[]};devs.forEach(function(d){var s=dm[d.id];if(s.dkm>=4)ti.h.push(s);else if(s.dkm>=2)ti.n.push(s);else if(s.dkm>=1)ti.l.push(s);else ti.v.push(s)});
+var mIdle={},mTr={};mk.forEach(function(k){mIdle[k]=ms[k].idle;mTr[k]=ms[k].trips});
+_dd={dv:devs.length,tr:trips.length,ex:exs.length,fl:faults.length,sp:span,mo:mCt,ih:tI,dh:tD,ir:iR,gh:gh.length,ic:tpI.length,hr:sf.length,mt:mt.length,tw:Math.round(tW),mk:mk,mi:mIdle};
+/* Render */
+document.getElementById('total-waste-text').textContent='$'+fC(tW);
+var annLabel=span>=180?'Annual Projection':'Annual Estimate ('+span+'d sample — run quarterly for higher confidence)';
+document.getElementById('annual-text').textContent=annLabel+': $'+fC(tW*12)+' | '+span+' days across '+mCt+' month'+(mCt>1?'s':'');
+var fst=document.getElementById('fleet-size-text');if(fst)fst.textContent=devs.length;
+var dst=document.getElementById('data-span-text');if(dst)dst.textContent=span;
+document.getElementById('exec-summary-anchor').innerHTML=genES(gh,tpI,tpH,sf,mt,devs,span,tW,iC,iR,mc,dc,co2,mCt);
+document.getElementById('sustainability-anchor').innerHTML=genSust(tI,co2,span,iC);
+document.getElementById('monthly-trend-anchor').innerHTML=genTrend(mk,ms,devs.length,span);
+var grid=document.getElementById('findings-grid');grid.innerHTML='';
+grid.appendChild(mkGhost(gh,devs.length));
+var idDesc=tpI.length>0?tpI[0].nm+' leads at '+tpI[0].val+'. Peak patterns show '+(tpI[0].pk>=21||tpI[0].pk<=5?'overnight warm-ups — block heaters recommended.':'midday dwell — engine-off policy needed.'):'';grid.appendChild(mkCard('🔥 Idle Time Burn','#dd6b20','$'+fC(iC),idDesc,'Hrs','val',tpI.slice(0,5)));
+var hrDesc=sf.length>0?sf.length+' vehicles exceed 2× fleet safety avg. Each costs ~$200/mo in wear and insurance risk.'+(dc>0?' <b>'+dc+' device noise issue'+(dc>1?'s':'')+' found</b> across fleet.':''):'';
+grid.appendChild(mkCard('⚡ High-Risk Driving','#d69e2e','$'+fC(rC),hrDesc,'×Avg','avg',sf.slice(0,5)));
+var brDesc=mt.length>0?mt.length+' vehicle'+(mt.length>1?'s have':' has')+' recurring fault codes. $400 inspection avoids $1,200-$3,500 breakdown.':'No recurring faults — fleet mechanical health is good.';
+grid.appendChild(mkCard('🔧 Breakdown Risk','#3182ce','$'+fC(mC),brDesc,'Faults','val',mt.slice(0,5)));
+document.getElementById('action-plan-anchor').innerHTML=genAP(gh,tpI,sf,mt,dm,devs,span,ni,tW,iC,mC,tpH,rC,co2,rm,dnX);
+genEv(dm,gh,tpI,sf,mt,rm,ni,devs,span,isE,trips.length);
+console.log("[v2.0] W:"+tW+" mo:"+mCt+" sp:"+span+"d")}
+/* == EXEC SUMMARY == */
+function genES(gh,idl,tpH,hr,mt,dv,sp,tW,iC,iR,mc,dc,co2,mCt){
+var aW=tW*12,conf=sp>=180?'':'<br><span style="font-size:11px;color:#a0aec0">⚠️ Tool requested 365 days of history — database contains '+sp+' days. Projections based on available data. Run quarterly to build trend history.</span>';
+var p='Your fleet of <b>'+dv.length+'</b> vehicles analyzed over <b>'+sp+' days</b>'+(mCt>1?' ('+mCt+' months)':'')+'. ';
+if(tW===0)p+='No significant recoverable costs found — fleet operating efficiently.';
+else{p+='Identified <b style="color:#fc8181">$'+fC(tW)+' in monthly recoverable costs</b> ($'+fC(aW)+' annual). ';
+p+=aW>50000?'Requires immediate attention.':aW>20000?'Addressable through targeted changes.':'Moderate but prevents escalation.'}
+var mo=new Date().getMonth(),s='';
+if(mo>=11||mo<=2){s='<b>🍁 Canadian Winter:</b> Some idle expected — NRCan recommends max 3-5 min warm-up for modern diesels. ';
+if(idl.length>0&&idl[0].hrs>5)s+='Your top idler at <b>'+idl[0].hrs.toFixed(1)+' hrs</b> far exceeds cold-weather needs — this is recoverable operational cost. ';
+if(mCt>=6)s+='Monthly trend below shows seasonal patterns across your data.';else s+='Re-run quarterly to build seasonal comparison — 6+ months needed for reliable winter vs. spring baseline.'}
+else if(mo>=3&&mo<=5)s='<b>🍁 Spring:</b> Fleets ramping up. Ghost vehicles now are chronic. Ideal baseline before peak.';
+else if(mo>=6&&mo<=8){s='<b>🍁 Summer:</b> Peak season. Underperformers = strong removal candidates.';if(idl.length>0)s+=' Every idle hour is directly recoverable.'}
+else s='<b>🍁 Fall:</b> Pre-winter maintenance window. Fix breakdowns before cold stress.';
+var b='<b>📏 Benchmarks:</b> Fleet idle rate <b>'+iR.toFixed(0)+'%</b> '+(iR>30?'— <span style="color:#fc8181">well above</span> NRCan &lt;15% target.':iR>15?'— <span style="color:#fbd38d">above</span> NRCan &lt;15%.':'— <span style="color:#68d391">within</span> NRCan &lt;15% target.');
+var f='<b>Key Findings:</b> ',fs=[];
+if(gh.length>0)fs.push(gh.length+' vehicle'+(gh.length>1?'s':'')+' below 40% utilization (~$'+fC(gh.length*800)+'/mo)');
+if(idl.length>0)fs.push('Top '+idl.length+' idlers: '+tpH.toFixed(0)+' hrs ($'+fC(iC)+'/mo)');
+if(hr.length>0){if(mc>0)fs.push(hr.length+' exceed 2× safety avg — <b>'+mc+' mechanical</b> (need mechanic, not coaching)');else fs.push(hr.length+' exceed 2× safety avg')}
+if(dc>0)fs.push('<b>'+dc+' device issue'+(dc>1?'s':'')+'</b> detected — Geotab device reinstall, not engine problem')
+if(mt.length>0)fs.push(mt.length+' with recurring faults (inspect $400 vs $1,200+ breakdown)');
+f+=fs.length>0?fs.join('. ')+'.':'No significant issues.';
+var bl='';if(tW>0){bl='<b style="color:#68d391">💡 Bottom Line:</b> ';var bg={a:'',c:0};
+if(gh.length*800>bg.c)bg={a:'ghost reduction',c:gh.length*800};if(iC>bg.c)bg={a:'idle reduction',c:iC};
+if(hr.length*200>bg.c)bg={a:'safety & mechanical',c:hr.length*200};if(mt.length*800>bg.c)bg={a:'proactive maintenance',c:mt.length*800};
+bl+='Largest: <b>'+bg.a+'</b> ($'+fC(bg.c)+'/mo). See 90-Day Roadmap below.'}
+return '<div style="background:linear-gradient(135deg,#1a365d,#2d3748);color:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 4px 15px rgba(0,0,0,.15)"><h4 style="margin:0 0 4px 0">📊 Executive Summary</h4><p style="margin:0 0 16px 0;font-size:11px;color:#a0aec0">v2.0 | '+new Date().toLocaleDateString()+' | '+sp+'-day analysis</p><div style="font-size:13px;line-height:1.7;color:#e2e8f0"><p style="margin:0 0 12px 0">'+p+'</p><p style="margin:0 0 12px 0">'+s+'</p><p style="margin:0 0 12px 0">'+b+'</p><p style="margin:0 0 12px 0">'+f+'</p>'+(bl?'<p style="margin:0">'+bl+'</p>':'')+conf+'</div></div>'}
+/* == SUSTAINABILITY == */
+function genSust(tI,co2,sp,iC){
+if(tI<1)return '';
+var aI=tI*(365/sp),aF=aI*3.5,aC=aF*2.68/1000,s65=aC*.65,trees=Math.round(s65/.022),cars=(aC/4.6).toFixed(1);
+var h='<div style="background:linear-gradient(135deg,#22543d,#276749);color:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 4px 15px rgba(0,0,0,.15)">';
+h+='<h4 style="margin:0 0 4px 0">🌱 Fleet Sustainability &amp; Carbon Impact</h4>';
+h+='<p style="margin:0 0 12px 0;font-size:11px;color:#9ae6b4">For ESG reporting, government contract bids &amp; ISSB S2 climate disclosure</p>';
+h+='<div style="font-size:12px;line-height:1.7;color:#c6f6d5">';
+h+='<p style="margin:0 0 10px 0"><b>🇨🇦 Why This Matters (2025-26):</b> Canada removed its consumer carbon tax on fuel in April 2025. However, fleet operators still face material sustainability obligations:</p>';
+h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">';
+h+='<div class="gp"><b>Clean Fuel Regs</b><br>Still in effect (SOR/2022-140). Suppliers pass costs through at $0.04-0.06/L. Less fuel = direct savings.</div>';
+h+='<div class="gp"><b>Provincial Pricing</b><br>BC carbon tax + Quebec cap-and-trade active. Ontario fleets bidding on BC/QC contracts face compliance.</div>';
+h+='<div class="gp"><b>Gov Contracts</b><br>Federal &amp; municipal RFPs increasingly require ESG metrics. Fleet emissions data = procurement advantage.</div>';
+h+='<div class="gp"><b>ISSB S2 Disclosure</b><br>CSA adopting mandatory climate reporting. Public companies need Scope 1 fleet emissions data.</div></div>';
+h+='<b>Your Fleet Idle Carbon Footprint:</b>';
+h+='<table style="width:100%;font-size:12px;border-collapse:collapse;margin:8px 0 14px"><thead><tr style="border-bottom:1px solid rgba(255,255,255,.3)"><th style="padding:5px;text-align:left">Metric</th><th class="tc" style="padding:5px">Monthly</th><th class="tc" style="padding:5px">Annual</th><th class="ty" style="padding:5px">-30%</th><th class="tg" style="padding:5px">-65% (90d target)</th></tr></thead><tbody>';
+h+='<tr><td style="padding:4px">Fuel burned (idle)</td><td class="tc">'+(tI*3.5).toFixed(0)+' L</td><td class="tc">'+aF.toFixed(0)+' L</td><td class="ty">'+(aF*.7).toFixed(0)+' L</td><td class="tg">'+(aF*.35).toFixed(0)+' L</td></tr>';
+h+='<tr><td style="padding:4px">CO₂ emissions</td><td class="tc">'+(co2/1000).toFixed(1)+' t</td><td class="tc">'+aC.toFixed(1)+' t</td><td class="ty">'+(aC*.7).toFixed(1)+' t</td><td class="tg">'+(aC*.35).toFixed(1)+' t</td></tr>';
+h+='<tr><td style="padding:4px">Fuel cost</td><td class="tc">$'+fC(tI*4.3)+'</td><td class="tc">$'+fC(aI*4.3)+'</td><td class="ty">$'+fC(aI*4.3*.7)+'</td><td class="tg">$'+fC(aI*4.3*.35)+'</td></tr></tbody></table>';
+if(sp<180)h+='<div style="margin-bottom:10px;padding:6px 10px;background:rgba(255,255,255,0.08);border-radius:4px;font-size:10px;color:#9ae6b4">📊 Annual projections estimated from '+sp+' days of data. Run quarterly to improve accuracy — seasonal variation may shift these numbers ±20%.</div>';
+h+='<div style="display:flex;gap:10px">';
+h+='<div style="flex:1;text-align:center" class="gp">🌳 65% reduction = <b>'+s65.toFixed(1)+'t CO₂/yr</b> saved ≈ <b>'+trees+' trees</b></div>';
+h+='<div style="flex:1;text-align:center" class="gp">🚗 Current idle = <b>'+cars+' passenger cars</b> driven for a year</div>';
+h+='<div style="flex:1;text-align:center" class="gp">📊 Report-ready for ESG filings &amp; gov contract bids</div></div>';
+h+='</div></div>';return h}
+/* == MONTHLY TREND == */
+function genTrend(mk,ms,fs,sp){
+if(mk.length<1)return '';
+var mI=0;mk.forEach(function(k){if(ms[k].idle>mI)mI=ms[k].idle});if(mI<1)return '';
+var cH=120,h='<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:24px">';
+h+='<h5 style="margin:0 0 4px 0;color:#1a365d">📈 Monthly Fleet Idle Trend</h5>';
+h+='<p style="margin:0 0 14px 0;font-size:11px;color:#718096">'+mk.length+' month'+(mk.length>1?'s':'')+' | Bars=idle hrs | Color=season</p>';
+h+='<div style="display:flex;align-items:flex-end;height:'+cH+'px;gap:3px;padding:0 4px;border-bottom:2px solid #e2e8f0;margin-bottom:8px">';
+mk.forEach(function(k){var m=ms[k],p=mI>0?(m.idle/mI*100):0,mn=parseInt(k.split('-')[1])-1,bH=Math.max(p*cH/100,4);
+h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="font-size:9px;color:#4a5568;margin-bottom:2px">'+m.idle.toFixed(0)+'h</div><div style="width:100%;max-width:40px;height:'+bH+'px;background:'+sC(sOf(mn))+';border-radius:3px 3px 0 0" title="'+mL(k)+'"></div></div>'});
+h+='</div><div style="display:flex;gap:3px;padding:0 4px">';
+mk.forEach(function(k){h+='<div style="flex:1;text-align:center;font-size:9px;color:#718096">'+mL(k)+'</div>'});
+h+='</div><div style="display:flex;gap:10px;margin-top:10px;font-size:10px;color:#718096">';
+h+='<span>❄️ Winter</span><span>🌱 Spring</span><span>☀️ Summer</span><span>🍂 Fall</span></div>';
+h+='<details style="margin-top:10px"><summary style="font-size:11px;color:#3182ce;cursor:pointer">Monthly breakdown</summary>';
+h+='<table class="table table-sm" style="font-size:10px;margin-top:8px"><thead><tr><th>Month</th><th>Season</th><th>Trips</th><th>Idle Hrs</th><th>CO₂ (t)</th><th>Recoverable</th></tr></thead><tbody>';
+mk.forEach(function(k){var m=ms[k],mn=parseInt(k.split('-')[1])-1,sn=sOf(mn);
+h+='<tr><td>'+mL(k)+'</td><td>'+sI(sn)+'</td><td>'+m.trips+'</td><td>'+m.idle.toFixed(1)+'</td><td>'+(m.co2/1000).toFixed(2)+'</td><td>$'+fC(m.idle*4.3)+'</td></tr>'});
+h+='</tbody></table></details>';
+if(sp<90)h+='<div style="margin-top:10px;padding:10px;background:#fff5f5;border-left:4px solid #fc8181;border-radius:0 6px 6px 0;font-size:12px"><b>📊 Data Maturity:</b> This analysis covers <b>'+sp+' days</b>. Seasonal comparison requires 6+ months of data. Run this tool quarterly — each run strengthens the trend line and improves projection confidence. Schedule next audit for <b>'+new Date(Date.now()+90*864e5).toLocaleDateString()+'</b>.</div>';
+if(mk.length>=6){var wI=0,wM=0,nI=0,nM=0;mk.forEach(function(k){var mn=parseInt(k.split('-')[1])-1,m=ms[k];
+if(mn>=11||mn<=2){wI+=m.idle;wM++}else{nI+=m.idle;nM++}});
+if(wM>0&&nM>0){var wA=wI/wM,nA=nI/nM,df=nA>0?((wA-nA)/nA*100):0;
+h+='<div style="margin-top:10px;padding:10px;background:#ebf8ff;border-left:4px solid #3182ce;border-radius:0 6px 6px 0;font-size:12px"><b>Seasonality:</b> ';
+if(df>20)h+='Winter avg <b>'+wA.toFixed(0)+'h</b> vs non-winter <b>'+nA.toFixed(0)+'h</b> — <b>'+Math.round(df)+'% winter premium</b>. Target non-winter idle first, then set separate winter targets.';
+else if(df>0)h+='Minimal seasonal variation — idle is habitual, not weather-driven. Anti-idle policy effective year-round.';
+else h+='Non-winter months show higher idle — focus reduction on peak operating months.';
+h+='</div>'}}h+='</div>';return h}
+/* == ACTION PLAN == */
+function genAP(gh,idl,hr,mt,dm,dv,sp,ni,tW,iC,mC,iH,rC,co2,rm,dnX){
+var mV=[],dV=[],bV=[];hr.forEach(function(h){var d=(h.dt||'').toLowerCase();
+if(d.indexOf('engine')>-1||d.indexOf('fault')>-1||d.indexOf('light')>-1){if(h._devNoise)dV.push(h);else mV.push(h)}else bV.push(h)});
+if(dnX)dnX.forEach(function(x){dV.push(x)});
+var t30=Math.max(0,tW-(iC*.3)-mC),t60=tW*.5,t90=tW*.35,ct=co2/1000;
+var o='<div style="background:#fff;border:2px solid #1a365d;border-radius:12px;padding:24px;margin-bottom:24px"><div style="display:flex;justify-content:space-between;align-items:center"><h4 style="margin:0;color:#1a365d">🗓️ Fleet Optimization Roadmap</h4><span style="font-size:11px;color:#718096;cursor:pointer" onclick="window.print()">🖨️ Print</span></div><p class="si" style="margin:8px 0 16px;border:none;background:#edf2f7">Your 90-day plan. Each card names who, what, which vehicles, and how to measure. Start at the top. Print and hand to your team.</p>';
+/* URGENT with fault codes */
+if(mV.length>0||dV.length>0||mt.length>0){o+='<div style="background:#fff5f5;border:2px solid #fc8181;border-radius:8px;padding:16px;margin-bottom:20px"><h5 style="margin:0 0 4px 0;color:#c53030;font-size:15px">⚠️ URGENT: Safety &amp; Mechanical (This Week)</h5><p style="margin:0 0 12px 0;font-size:13px;color:#742a2a">$400 proactive inspection now avoids $1,200-$3,500 roadside breakdown. <b>Assign today.</b></p>';
+var seen={};
+mV.forEach(function(v){if(seen[v.nm])return;seen[v.nm]=true;
+var dev=dm[ni[v.nm]],fi='',ei='',mechNote='';
+/* Try mechanical faults first, then filtered all-faults (excluding device noise) */
+var faultSrc=[];
+if(dev&&dev.mf.length>0)faultSrc=dev.mf;
+else if(dev&&dev.af.length>0)faultSrc=dev.af.filter(function(f){var n=(f.diagnostic.id||'').toLowerCase();return !isN(n)});
+if(faultSrc.length>0){var fc={};faultSrc.forEach(function(f){var n=cD(f.diagnostic.id);fc[n]=(fc[n]||0)+1});
+var fl=[];Object.keys(fc).sort(function(a,b){return fc[b]-fc[a]}).forEach(function(k){fl.push('<li>'+k+' <b>(×'+fc[k]+')</b></li>')});
+fi='<b>🔍 Diagnostic Codes ('+faultSrc.length+'):</b><ul class="fault-list">'+fl.join('')+'</ul>';
+var uc=Object.keys(fc).length;
+mechNote=uc===1?'Single recurring code — mechanic should focus on this system.':uc<=3?'Related codes — likely system-level failure.':'Multiple systems — full diagnostic required.'}
+else{/* No FaultData at all — use exception events as evidence */
+fi='<b>🔍 No DTCs in Geotab</b> — '+v.val+' exception events indicate intermittent faults not captured as diagnostic codes.';
+mechNote='Pull DTCs via OBD-II/J1939 scanner during inspection.';
+/* Show top 5 exception events with timestamps */
+if(dev&&dev.ex.length>0){var topEv=dev.ex.filter(function(e){var rn=rm[e.rule.id]||'';return rn.toLowerCase().indexOf('engine')>-1||rn.toLowerCase().indexOf('fault')>-1}).sort(function(a,b){return new Date(b.activeFrom)-new Date(a.activeFrom)}).slice(0,5);
+if(topEv.length>0){fi+='<br><b>Recent fault events:</b><ul class="fault-list">';
+topEv.forEach(function(e){fi+='<li>'+e.activeFrom.substring(0,16).replace('T',' ')+' — '+(rm[e.rule.id]||'Event')+(e.duration?' ('+fD(e.duration)+')':'')+'</li>'});
+fi+='</ul>'}}}
+if(v.tc){var tc=[];Object.keys(v.tc).sort(function(a,b){return v.tc[b]-v.tc[a]}).forEach(function(k){tc.push(k+':'+v.tc[k])});ei='<br><b>Event breakdown:</b> '+tc.join(' | ')}
+o+=bA('#e53e3e','🔧 <b>'+v.nm+'</b> — '+v.val+' events ('+v.avg+'× avg)','Maintenance Coordinator','Pull from service. Book diagnostic. <b>Mechanical, NOT driver behavior.</b>'+(fi?'<div style="background:#f7fafc;border-radius:4px;padding:8px;margin:6px 0">'+fi+'</div>':'')+(mechNote?'<div style="background:#f0fff4;border-radius:4px;padding:6px 8px;margin:4px 0;font-size:11px"><b>⚙️</b> '+mechNote+'</div>':'')+(ei?'<div style="font-size:10px;color:#718096;margin-top:4px">'+ei.replace('<br>','')+'</div>':'')+'<div style="font-size:10px;color:#718096;margin-top:4px"><b>📍</b> MyGeotab → Faults → '+v.nm+'</div>',v.nm,'Diagnostic within 5 business days.','~$400','Avoids $1,200-$3,500 breakdown')});
+/* DEVICE ISSUES — Geotab device noise, NOT engine faults */
+dV.forEach(function(v){if(seen[v.nm])return;seen[v.nm]=true;
+var dev=dm[ni[v.nm]],noiseCount=0;if(dev&&dev.af){dev.af.forEach(function(f){var n=String(f&&f.diagnostic&&f.diagnostic.id||'').toLowerCase();if(n.indexOf('accelerometer')>-1)noiseCount++})}
+var cardTitle=v._extraDN?'📱 <b>'+v.nm+'</b> — '+noiseCount+' accelerometer noise records — <span style="color:#805ad5;font-weight:bold">DEVICE ISSUE</span>':'📱 <b>'+v.nm+'</b> — '+v.val+' events ('+v.avg+'× avg) — <span style="color:#805ad5;font-weight:bold">DEVICE ISSUE</span>';
+var ei='';if(v.tc){var tc=[];Object.keys(v.tc).sort(function(a,b){return v.tc[b]-v.tc[a]}).forEach(function(k){tc.push(k+':'+v.tc[k])});ei='<br><b>Event breakdown:</b> '+tc.join(' | ')}
+o+=bA('#805ad5',cardTitle,'IT / Geotab Support','<div style="background:#faf5ff;border-radius:4px;padding:8px;margin:4px 0"><b>⚠️ NOT an engine fault.</b> Geotab GO device: '+noiseCount+' accelerometer noise records triggering "Engine Fault Exception" rule. Root cause is <b>device installation</b>, not engine.</div><div style="background:#f0fff4;border-radius:4px;padding:6px 8px;margin:4px 0;font-size:11px"><b>📱</b> Check device mounting, wiring, firmware. Contact Geotab support if persistent. <b>Do NOT send to mechanic.</b></div>'+(ei?'<div style="font-size:10px;color:#718096;margin-top:4px">'+ei.replace('<br>','')+'</div>':'')+'<div style="font-size:10px;color:#718096;margin-top:4px"><b>📍</b> MyGeotab → Admin → Devices → '+v.nm+'</div>',v.nm,'Device checked within 10 business days.','$0 (warranty) or ~$150','Eliminates false alerts + restores safety data')});
+mt.forEach(function(v){if(seen[v.nm])return;seen[v.nm]=true;
+var dev=dm[ni[v.nm]],fi='';
+var faultSrc=[];
+if(dev&&dev.mf.length>0)faultSrc=dev.mf;
+else if(dev&&dev.af.length>0)faultSrc=dev.af.filter(function(f){var n=(f.diagnostic.id||'').toLowerCase();return !isN(n)});
+if(faultSrc.length>0){var fc={};faultSrc.forEach(function(f){var n=cD(f.diagnostic.id);fc[n]=(fc[n]||0)+1});
+var fl=[];Object.keys(fc).sort(function(a,b){return fc[b]-fc[a]}).forEach(function(k){fl.push('<li>'+k+' <b>(×'+fc[k]+')</b></li>')});
+fi='<div style="background:#f7fafc;border-radius:4px;padding:8px;margin:6px 0"><b>🔍 Codes ('+faultSrc.length+'):</b><ul class="fault-list">'+fl.join('')+'</ul></div>';
+var uc=Object.keys(fc).length;
+fi+='<div style="background:#f0fff4;border-radius:4px;padding:6px 8px;margin:4px 0;font-size:11px"><b>⚙️</b> '+(uc===1?'Single recurring code — focus on this system.':uc<=3?'Related codes — system-level diagnosis needed.':'Diverse codes — full inspection required.')+'</div>'}
+o+=bA('#e53e3e','🔧 <b>'+v.nm+'</b> — '+v.val+' recurring faults','Maintenance Coordinator','Proactive inspection needed. Repeated codes signal component failure.'+fi+'<div style="font-size:10px;color:#718096;margin-top:4px"><b>📍</b> MyGeotab → Faults → '+v.nm+'</div>',v.nm,'Inspection within 10 business days.','~$400','Prevents $1,200+ breakdown')});
+o+='</div>'}
+/* 30 DAY */
+o+='<div style="border-left:4px solid #38a169;padding:16px;margin-bottom:20px;background:#f0fff4;border-radius:0 8px 8px 0"><h5 style="margin:0 0 4px 0;color:#276749;font-size:15px">📅 30-Day Plan: Quick Wins</h5><p style="margin:0 0 4px 0;font-size:13px;color:#276749;font-weight:bold">🎯 $'+fC(tW)+' → $'+fC(t30)+'</p><p style="margin:0 0 14px 0;font-size:12px;color:#2f855a">Low-cost, high-impact actions. Most cost $0. Establish baseline monitoring and stop the bleed.</p>';
+if(idl.length>0){o+=bA('#38a169','📋 Anti-Idle Policy (Week 1)','Fleet Manager → All Drivers','Engines OFF after 3 min. Exception: below -15°C diesel (NRCan: 3-5 min max). Post in break rooms.','All — monitor: '+idl.slice(0,3).map(function(i){return i.nm}).join(', '),'Productivity weekly. Baseline: '+iH.toFixed(0)+' hrs. Day 30 target: '+(iH*.7).toFixed(0)+' hrs (-30%).','$0','~$'+fC(iC*.3)+'/mo + '+(ct*.3).toFixed(1)+'t CO₂');
+o+=bA('#38a169','🔌 Block Heaters (Week 1-2)','Maintenance','Top 3 idlers. $200-400 installed. Eliminates 10-20 min warm-up.',idl.slice(0,3).map(function(i){return i.nm}).join(', '),'Quotes by Day 14.','$200-400/v','~$3.50/day (60-90d payback)')}
+if(mV.length>0)o+=bA('#38a169','🔧 Verify Inspections (Week 2)','Fleet Manager','Confirm Urgent vehicles inspected: booked → diagnosed → repaired.',mV.map(function(v){return v.nm}).join(', '),'All '+mV.length+' by Day 14.','~$400/v','Avoids $1,200-$3,500');
+if(dV.length>0)o+=bA('#38a169','📱 Device Check (Week 2)','IT / Fleet Admin','Verify Geotab GO device mounting and firmware on flagged vehicles.',dV.map(function(v){return v.nm}).join(', '),'All '+dV.length+' checked by Day 14.','$0','Eliminates false alerts');
+if(bV.length>0)o+=bA('#38a169','👤 Driver Coaching (Week 2-3)','Safety Lead','One-on-one. Share data. Target: -50% events in 30d.',bV.map(function(v){return v.nm}).join(', '),'Done by Day 21.','$0','Reduces insurance risk');
+o+=bA('#38a169','📊 MyGeotab Monitoring (Week 2)','Fleet Admin','Weekly auto-reports: idle, exceptions, faults.','Fleet-wide','Running by Day 14.','$0','Ongoing detection');
+o+='</div>';
+/* 60 DAY */
+o+='<div style="border-left:4px solid #3182ce;padding:16px;margin-bottom:20px;background:#ebf8ff;border-radius:0 8px 8px 0"><h5 style="margin:0 0 4px 0;color:#2b6cb0;font-size:15px">📅 60-Day Plan: Measure &amp; Adjust</h5><p style="margin:0 0 4px 0;font-size:13px;color:#2b6cb0;font-weight:bold">🎯 $'+fC(t60)+' (50% reduction)</p><p style="margin:0 0 14px 0;font-size:12px;color:#2a69ac">Compare before and after. What worked? Adjust course. Data-driven decisions replace guesswork.</p>';
+o+=bE('#3182ce','🔄 Re-Run Audit (Day 30)','Fleet Manager','Compare side-by-side. Idle down 30%? Faults resolved?','Fleet-wide','Both reports printed.','If idle NOT down 20%: escalate to GPS idle alerts.');
+o+=bE('#3182ce','📈 Driver Scorecards (Day 35)','Manager + Safety','Compare before/after. Recognize improvements.','Flagged drivers','Each shows improvement OR documented plan.','No improvement after 30d → progressive discipline.');
+if(idl.length>0)o+=bE('#3182ce','🔌 Block Heaters (Day 35-45)','Maintenance','Install. Train: plug in overnight.','Equipped','10-15 min/day idle reduction.','Unchanged → driver habit.');
+if(gh.length>0)o+=bE('#3182ce','📊 Ghost Review (Day 35-50)','Manager + Depts','Assigned? Pool? Keep/Share/Remove.',gh.map(function(g){return g.nm}).join(', '),'Written recommendation per vehicle.','<40% unjustified → lease return.');
+o+=bE('#3182ce','💰 Actual Savings (Day 55)','Fleet Manager','Fuel receipts + MyGeotab vs $'+fC(tW)+'/mo baseline. Include CO₂ for ESG.','Fleet-wide','Report with real $ + CO₂.','<30% target → idle shutoff timers.');
+o+='</div>';
+/* 90 DAY */
+o+='<div style="border-left:4px solid #805ad5;padding:16px;margin-bottom:20px;background:#faf5ff;border-radius:0 8px 8px 0"><h5 style="margin:0 0 4px 0;color:#553c9a;font-size:15px">📅 90-Day Plan: Systematize</h5><p style="margin:0 0 4px 0;font-size:13px;color:#553c9a;font-weight:bold">🎯 $'+fC(t90)+' (65% reduction) + SOP</p><p style="margin:0 0 14px 0;font-size:12px;color:#6b46c1">Lock in gains with SOPs. Without them, improvements regress within 6 months.</p>';
+o+=bA('#805ad5','🔄 Third Audit','Fleet Manager','3 data points. Present trend to management.','Fleet-wide','Three reports showing trend.','$0','Validates ROI');
+var mo=new Date().getMonth();
+if(mo>=11||mo<=2)o+=bA('#805ad5','🌱 Spring Baseline (Apr/May)','Fleet Manager','Schedule spring audit. Compare winter vs spring idle. With 2+ quarters, seasonal patterns become defensible. Ghost vehicles should show higher spring utilization — if not, confirms year-round underuse.','Flagged','Calendar: April 15.','$0','Builds data confidence');
+if(gh.length>0)o+=bA('#805ad5','📋 Fleet Right-Sizing','Manager + Finance','Finalize return/reassign. Lease terms.',gh.map(function(g){return g.nm}).join(', '),'Decision per vehicle.','Varies','$800/mo per vehicle');
+o+=bA('#805ad5','📊 SOP','Fleet Manager','(1) Monthly audit 1st Monday (2) Weekly idle review (3) Faults within 48h (4) Quarterly fleet review (5) Annual ESG report.','Fleet-wide','Written SOP approved. Calendar set.','$0','Prevents regression');
+o+='</div>';
+/* PROGRESS TRACKER */
+o+='<div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:16px"><h5 style="margin:0 0 8px 0;color:#1a365d">📈 Progress Tracker</h5><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="background:#edf2f7"><th style="padding:6px;text-align:left">Metric</th><th class="tc" style="padding:6px">Today</th><th class="tc" style="padding:6px">30d</th><th class="tc" style="padding:6px">60d</th><th class="tc" style="padding:6px">90d</th></tr></thead><tbody>';
+o+='<tr><td style="padding:5px">Recoverable/mo</td><td class="tr" style="font-weight:bold">$'+fC(tW)+'</td><td class="tc">$'+fC(t30)+'</td><td class="tc">$'+fC(t60)+'</td><td class="tg" style="font-weight:bold">$'+fC(t90)+'</td></tr>';
+if(iH>0)o+='<tr><td style="padding:5px">Idle hrs/mo</td><td class="tr">'+iH.toFixed(0)+'</td><td class="tc">'+(iH*.7).toFixed(0)+'</td><td class="tc">'+(iH*.5).toFixed(0)+'</td><td class="tg">'+(iH*.4).toFixed(0)+'</td></tr>';
+if(hr.length>0)o+='<tr><td style="padding:5px">Vehicles>2× safety</td><td class="tr">'+hr.length+'</td><td class="tc">'+Math.ceil(hr.length*.6)+'</td><td class="tc">1-2</td><td class="tg">0</td></tr>';
+if(mt.length>0)o+='<tr><td style="padding:5px">Breakdown risk</td><td class="tr">'+mt.length+'</td><td class="tg">0</td><td class="tg">0</td><td class="tg">0</td></tr>';
+if(ct>.05)o+='<tr><td style="padding:5px">🌱 CO₂ idle (t/mo)</td><td class="tr">'+ct.toFixed(1)+'</td><td class="tc">'+(ct*.7).toFixed(1)+'</td><td class="tc">'+(ct*.5).toFixed(1)+'</td><td class="tg">'+(ct*.4).toFixed(1)+'</td></tr>';
+o+='</tbody></table><p style="margin:10px 0 0;font-size:11px;color:#718096;text-align:center">Annual savings at 90d: <b style="color:#38a169">$'+fC((tW-t90)*12)+'</b> + <b style="color:#38a169">'+(ct*.6*12).toFixed(1)+'t CO₂</b></p></div>';
+/* CHECKLIST */
+o+='<div style="border:2px dashed #718096;border-radius:8px;padding:20px;background:#fff;font-size:12px;line-height:2.1"><div style="display:flex;justify-content:space-between"><h5 style="margin:0 0 10px 0">✅ Checklist</h5><span style="font-size:11px;color:#718096">✂️ Print</span></div>';
+if(mV.length>0||dV.length>0||mt.length>0){o+='<b style="color:#c53030">URGENT:</b><br>';var sn={};mV.concat(mt).forEach(function(v){if(!sn[v.nm]){sn[v.nm]=true;o+='☐ Diagnostic (mechanic): '+v.nm+'<br>'}});dV.forEach(function(v){if(!sn[v.nm]){sn[v.nm]=true;o+='☐ Device check (IT/Geotab): '+v.nm+'<br>'}})}o+='<b style="color:#38a169">MONTH 1:</b><br>';
+if(idl.length>0)o+='☐ Anti-idle policy distributed<br>☐ Signage posted<br>☐ Block heater quotes: '+idl.slice(0,3).map(function(i){return i.nm}).join(', ')+'<br>';
+o+='☐ Weekly MyGeotab reports set up<br>';
+if(bV.length>0)o+='☐ Safety talks: '+bV.map(function(v){return v.nm}).join(', ')+'<br>';
+o+='☐ <b>Day 30: Re-run audit</b><br>';
+o+='<b style="color:#3182ce">MONTH 2:</b><br>☐ Driver scorecards<br>';
+if(idl.length>0)o+='☐ Block heaters installed<br>';
+if(gh.length>0)o+='☐ Ghost review: '+gh.map(function(g){return g.nm}).join(', ')+'<br>';
+o+='☐ Day 45: Actual $ saved + CO₂<br>☐ <b>Day 60: Re-run audit</b><br>';
+o+='<b style="color:#805ad5">MONTH 3:</b><br>';
+if(mo>=11||mo<=2)o+='☐ Spring audit (Apr 15)<br>';
+if(gh.length>0)o+='☐ Fleet right-sizing decisions<br>';
+o+='☐ SOP in operations manual<br>☐ <b>Present 90-day results + CO₂ to management</b><br>';
+o+='</div></div>';return o}
+function bA(c,t,w,a,v,m,co,s){return '<div class="ac" style="border-left:4px solid '+c+';padding:14px 16px"><div style="font-size:13px;font-weight:bold;margin-bottom:8px">'+t+'</div><div style="display:grid;grid-template-columns:70px 1fr;gap:2px 10px;font-size:11px"><span class="rw">Assign to</span><span>'+w+'</span><span class="rw">Action</span><div>'+a+'</div><span class="rw">Vehicles</span><span>'+v+'</span><span class="rw">Measure</span><span>'+m+'</span></div><div style="display:flex;gap:16px;margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f0;font-size:11px"><span>💰 Cost: <b>'+co+'</b></span><span style="color:#38a169">📈 Savings: <b>'+s+'</b></span></div></div>'}
+function bE(c,t,w,a,v,m,e){return '<div class="ac" style="border-left:4px solid '+c+';padding:14px 16px"><div style="font-size:13px;font-weight:bold;margin-bottom:8px">'+t+'</div><div style="display:grid;grid-template-columns:70px 1fr;gap:2px 10px;font-size:11px"><span class="rw">Assign to</span><span>'+w+'</span><span class="rw">Action</span><div>'+a+'</div><span class="rw">Vehicles</span><span>'+v+'</span><span class="rw">Measure</span><span>'+m+'</span></div><div style="margin-top:8px;padding:6px 10px;background:#fff5f5;border-radius:4px;font-size:11px;color:#e53e3e"><b>⚠️ If stuck:</b> '+e+'</div></div>'}
+/* == CARDS == */
+function mkGhost(l,fc){var ghDesc=l.length>0?l.length+' of '+fc+' vehicles below 40% utilization. At $800/mo each (lease+insurance), these represent $'+fC(l.length*800)+'/mo in underused assets.':'All vehicles above 40% utilization — no ghost vehicles.';var r=l.length>0?'':'<tr><td colspan="4">✅ None</td></tr>';l.forEach(function(i){r+='<tr><td>'+i.nm+'</td><td>'+i.val+'</td><td>'+i.dist.toFixed(0)+'</td><td>$'+Math.round(i.cp)+'</td></tr>'});return cW('🚫 Ghost Vehicles','#e53e3e',ghDesc,'Util','km','$/km',r)}
+function mkCard(t,c,a,desc,u,vK,l){var r=l.length>0?'':'<tr><td colspan="2">None</td></tr>';l.forEach(function(i){r+='<tr><td>'+i.nm+'</td><td>'+i[vK]+'</td></tr>'});return cW(t,c,desc,u,'',null,r,a)}
+function cW(t,c,desc,u1,u2,u3,r,a){var d=document.createElement('div');d.className='col-md-6 mb-3';d.innerHTML='<div class="card h-100 shadow-sm" style="border-left:5px solid '+c+'"><div class="card-body"><h6>'+t+'</h6>'+(a?'<h6 style="color:'+c+'">'+a+'</h6>':'')+(desc?'<p style="font-size:11px;color:#4a5568;margin:4px 0 8px;line-height:1.5">'+desc+'</p>':'')+'<table class="table table-sm mt-2" style="font-size:10px"><thead><tr><th>Vehicle</th><th>'+u1+'</th>'+(u2?'<th>'+u2+'</th>':'')+(u3?'<th>'+u3+'</th>':'')+'</tr></thead><tbody>'+r+'</tbody></table></div></div>';return d}
+/* == EVIDENCE == */
+function genEv(dm,gh,idl,hr,mt,rm,ni,dv,sp,isE,tT){
+var c=document.getElementById('evidence-report');c.style.display='block';
+var h='<hr><h4>📋 Evidence Report</h4><p class="si">Data backing each finding above. Use to verify claims or brief your mechanic.</p><h5>📊 Fleet Overview</h5><p style="font-size:13px">'+dv.length+' units | '+sp+' days | '+tT+' trips</p>';
+var uB={a:0,b:0,c:0,d:0};
+dv.forEach(function(d){var s=dm[d.id],u=(Object.keys(s.ad).length/sp)*100;if(u<25)uB.a++;else if(u<50)uB.b++;else if(u<75)uB.c++;else uB.d++});
+h+='<div style="font-size:12px;font-family:monospace;background:#f7fafc;padding:8px;margin:8px 0 12px;border-radius:4px"><span style="color:#e53e3e">0-25%:   '+'█'.repeat(uB.a)+' '+uB.a+'</span><br><span style="color:#dd6b20">25-50%:  '+'█'.repeat(uB.b)+' '+uB.b+'</span><br><span style="color:#d69e2e">50-75%:  '+'█'.repeat(uB.c)+' '+uB.c+'</span><br><span style="color:#38a169">75-100%: '+'█'.repeat(uB.d)+' '+uB.d+'</span></div>';
+function mT(rows,cols){var t='<table class="table table-sm" style="font-size:10px"><thead><tr>';cols.forEach(function(c){t+='<th>'+c+'</th>'});t+='</tr></thead><tbody>';rows.forEach(function(r){t+='<tr>';r.forEach(function(c){t+='<td>'+c+'</td>'});t+='</tr>'});return t+'</tbody></table>'}
+if(idl.length>0){h+='<hr><h5>🔥 Idle Details</h5>';
+idl.forEach(function(il){var d=dm[ni[il.nm]];if(!d)return;
+var it=(d.tr||[]).filter(function(t){return pD(t.idlingDuration)>.001}).sort(function(a,b){return pD(b.idlingDuration)-pD(a.idlingDuration)}).slice(0,8);
+var hb={};(d.tr||[]).forEach(function(t){var ih=pD(t.idlingDuration);if(ih>.001&&t.start){var hr=new Date(t.start).getHours();hb[hr]=(hb[hr]||0)+ih}});
+var bS=0,bM=0;for(var x=0;x<24;x++){var w=(hb[x]||0)+(hb[(x+1)%24]||0)+(hb[(x+2)%24]||0);if(w>bM){bM=w;bS=x}}
+var pE=(bS+3)%24,pT=(bS<10?'0':'')+bS+':00-'+(pE<10?'0':'')+pE+':00';
+var tV=0;Object.keys(hb).forEach(function(k){tV+=hb[k]});var pP=tV>0?Math.round(bM/tV*100):0;
+var rc=bS<7?'🌙 Warm-up.':bS<14?'☀️ Midday dwell.':'🌙 Evening.';
+h+='<div class="vc"><b>'+il.nm+'</b> — '+il.hrs.toFixed(1)+' hrs (~$'+Math.round(il.w)+'/mo)<div class="ab">Peak <b>'+pT+'</b> ('+pP+'%) | '+d.tr.length+' trips | '+rc+'</div>';
+var rows=[];it.forEach(function(t){var ih=pD(t.idlingDuration),dh=pD(t.drivingDuration),tot=dh+ih;rows.push([(t.start?t.start.substring(0,10):'—'),fD(t.idlingDuration),(tot>0?Math.round(ih/tot*100):0)+'%'])});
+h+=mT(rows,['Date','Idle','%Trip'])+'</div>'})}
+if(hr.length>0){h+='<hr><h5>⚡ High-Risk Details</h5>';
+hr.forEach(function(r){var d=dm[ni[r.nm]];if(!d)return;
+var ct={},mx=0,tR="Event";(d.ex||[]).forEach(function(e){var r2=rm[e.rule.id]||"Event";ct[r2]=(ct[r2]||0)+1;if(ct[r2]>mx){mx=ct[r2];tR=r2}});
+var bd=[];Object.keys(ct).sort(function(a,b){return ct[b]-ct[a]}).forEach(function(k){bd.push(k+':'+ct[k])});
+var dL=tR.toLowerCase(),rc;if(r._devNoise)rc='📱 Device noise.';else if(dL.indexOf('engine')>-1||dL.indexOf('fault')>-1)rc='⚙️ Mechanical.';else if(dL.indexOf('speed')>-1)rc='🏎️ Speed.';else rc='📋 Mixed.';
+var ev=(d.ex||[]).sort(function(a,b){return new Date(b.activeFrom)-new Date(a.activeFrom)}).slice(0,8);
+h+='<div class="vc"><b>'+r.nm+'</b> — '+d.ec+' events ('+r.avg+'×)<div class="ay">'+tR+' | '+bd.join(' | ')+'<br>'+rc+'</div>';
+var rows=[];ev.forEach(function(e){rows.push([(e.activeFrom?e.activeFrom.substring(0,16).replace('T',' '):'—'),(rm[e.rule.id]||'Event'),(e.duration?fD(e.duration):'—')])});
+h+=mT(rows,['Time','Rule','Dur'])+'</div>'})}
+if(mt.length>0){h+='<hr><h5>🔧 Breakdown Risk</h5>';
+mt.forEach(function(m){var d=dm[ni[m.nm]];if(!d)return;
+var fl=(d.mf||[]).sort(function(a,b){return new Date(b.dateTime||b.date||0)-new Date(a.dateTime||a.date||0)}).slice(0,8);
+var dt={};fl.forEach(function(f){var dn=cD(f.diagnostic.id);dt[dn]=(dt[dn]||0)+1});
+var ds=[];Object.keys(dt).forEach(function(k){ds.push(k+' (×'+dt[k]+')')});
+h+='<div class="vc"><b>'+m.nm+'</b> — '+m.val+' faults<div class="az">'+ds.join(', ')+'</div>';
+var rows=[];fl.forEach(function(f){rows.push([(f.dateTime||f.date||'').substring(0,16).replace('T',' '),cD(f.diagnostic.id),(f.failureMode&&f.failureMode.name)||'—'])});
+h+=mT(rows,['Time','Code','Mode'])+'</div>'})}
+c.innerHTML=h+'<p class="text-muted small mt-3">v2.0 | Fleet Cost Optimizer</p>'}
+</script></body></html>
