@@ -6,6 +6,13 @@ One click. 30 seconds. Tells your fleet manager exactly who to call, what to fix
 
 ![Version](https://img.shields.io/badge/version-2.0-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-MyGeotab-orange)
 
+<div align="center">
+
+### 🚀 <a href="https://sanjayaabeysinghe.github.io/fleet-cost-optimizer/fco-intro-v2.html" target="_blank">Watch the Interactive Intro →</a>
+*60-second animated walkthrough — what the tool finds, how it classifies, and the 90-day plan it builds*
+
+</div>
+
 ---
 
 ## The Problem
@@ -17,6 +24,8 @@ MyGeotab has over 100 built-in reports. Here's what a fleet manager sees when th
 Twelve categories. 39 productivity reports. 29 maintenance reports. 14 safety reports. Each one answers a single question — "which vehicles were idling?" or "who had fault codes?" — but none of them connect the dots. A fleet manager has to open 5-6 different reports, mentally cross-reference the data, figure out which findings actually matter, decide who should handle each one, and then somehow track whether anything got done.
 
 The gap between "seeing the numbers" and "knowing what to do" costs real money. For this demo fleet of 50 vehicles, that gap is **$12,443/month.**
+
+> *"Why not just use the built-in Fleet Utilization Report?"* — See [Appendix A](#appendix-a-fleet-utilization-report-comparison) for a side-by-side comparison.
 
 ---
 
@@ -205,7 +214,7 @@ What I'd build with another sprint, ranked by impact on fleet manager experience
 5. **Save** → hard refresh (Ctrl+Shift+R)
 6. Find **"Fleet Cost Optimizer"** in the sidebar → click **Run Audit**
 
-No server. No API keys. No build step. The entire tool is a single HTML file embedded in a JSON config.
+No server. No API keys. No build step. You don't need to upload the HTML separately — the entire UI (HTML, CSS, JavaScript) is embedded inside the JSON config under the `"files"` key. One file does everything.
 
 ## Technical Architecture
 
@@ -276,6 +285,7 @@ Full prompt history: [`PROMPTS.md`](PROMPTS.md) and [`Google_Gem_History.txt`](G
 |---|---|
 | `fleet-cost-optimizer-v2.0.json` | The Add-In config. Paste into MyGeotab. |
 | `audit-v2.0.html` | Extracted HTML for reading the source code. |
+| `fco-intro-v2.html` | Interactive 60-second intro presentation. <a href="https://sanjayaabeysinghe.github.io/fleet-cost-optimizer/fco-intro-v2.html" target="_blank">Live version →</a> |
 | `README.md` | You're here. |
 | `VIBE_CODING_JOURNEY.md` | Full build story — version by version, every bug, every fix. |
 | `SUBMISSION_STORY.md` | Short-form submission description. |
@@ -298,6 +308,20 @@ Full prompt history: [`PROMPTS.md`](PROMPTS.md) and [`Google_Gem_History.txt`](G
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+## Appendix A: Fleet Utilization Report Comparison
+
+I ran the Fleet Utilization Report on the same demo fleet to see what it gives you. Five tabs, 50 vehicles, 397-day date range. The core output is total distance per vehicle, bucketed into distance bands — Demo-42 at 253 km on the low end, Demo-43 at 2,551 km at the top. The Vehicle Count tab shows the distribution: 10 vehicles in the 201-500 km range, 21 in 501-1000, 19 over 1000.
+
+That's distance. That's all it has.
+
+Demo-42 shows 253 km and you know it's low — but is that because it's been sitting in a lot for a month, or because it joined the fleet last Tuesday? The report doesn't track when each vehicle started. Demo-31 shows 2,169 km and looks like a top performer — except it also idled 8 hours, which you'd only find in a completely different report. The four vehicles with hundreds of accelerometer exceptions? Not here. The report has columns for 6 exception types but they all came back empty for this fleet.
+
+The data exists inside MyGeotab — idle time, fault codes, exception events — it's just spread across separate reports. A fleet manager would need to open the Fault Report, the Exception Report, Trip History, run them each individually, then mentally piece together which vehicles actually need attention and who should handle it.
+
+Fleet Cost Optimizer pulls Trips, FaultData, ExceptionEvents, Devices, and Diagnostics in one API call and does that cross-referencing for you. Utilization is calculated as a percentage of active days since each vehicle's first recorded trip — not just raw km. Faults get classified into mechanical vs. device noise so nobody sends a mechanic for a firmware problem. Every finding has a dollar amount, an owner, and a deadline.
 
 ---
 
