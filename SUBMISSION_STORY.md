@@ -16,10 +16,10 @@ Fleet Cost Optimizer is a single-file MyGeotab Add-In (under 50KB) that runs a o
 
 **Sustainability** tells the Canadian story — CO₂ from idle mapped against Clean Fuel Regulations (SOR/2022-140), ISSB S2 climate disclosures via CSA, and provincial carbon pricing ($65-170/tonne). Includes reduction scenario tables. Specific to what a Canadian fleet operator actually faces in 2026.
 
-For the demo fleet of 50 vehicles: $10,843/month in recoverable costs.
+For the demo fleet of 50 vehicles: $12,443/month in recoverable costs.
 
 ## The Vibe Coding Journey
 
-Built using two AI tools: the **Geotab Add-In Architect Gem** (Google Gemini) for code generation (~50 prompts) and **Claude** for strategy, data validation, and debugging (~20 prompts). The messiest part — 15 consecutive config errors, an Ace AI integration that ate 11 prompts and never worked, and the cross-validation session that caught the device noise problem — turned out to matter most.
+Built using the **Geotab Add-In Architect Gem** (Google Gemini) for code generation (~50 prompts), **Claude** for strategy, data validation, and debugging (~20 prompts), and **HeyGen** for the demo video voiceover. The messiest part — 15 consecutive config errors, an Ace AI integration that ate 11 prompts and never worked, and the cross-validation session that caught the device noise problem — turned out to matter most.
 
 Full prompt history: [PROMPTS.md](PROMPTS.md) | Full build story: [VIBE_CODING_JOURNEY.md](VIBE_CODING_JOURNEY.md)

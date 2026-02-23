@@ -1,6 +1,6 @@
 # How I Built Fleet Cost Optimizer — The Full Vibe Coding Story
 
-I spent about 12 hours over one weekend building this. Some of it went smoothly. A lot of it didn't. This is the honest version — every prompt, every bug, every "why is this blank again" moment.
+I spent about 20 hours over one weekend building this. Some of it went smoothly. A lot of it didn't. This is the honest version — every prompt, every bug, every "why is this blank again" moment.
 
 Two tools did the heavy lifting: the **Geotab Add-In Architect Gem** (Google Gemini) generated the code, and **Claude** helped me think through strategy, validate data, and debug the stuff the Gem couldn't see.
 
@@ -40,7 +40,7 @@ This led me to NRCan's FleetSmart benchmarks, CAA breakdown cost data, and provi
 
 One click → 30 seconds → a full report that a fleet manager can print and hand to their boss. Here's what each section gives them and why it's there.
 
-**Executive Summary** opens with a fleet health score based on up to 365 days of data (22 days in the demo database). It tells you the headline number ("$10,843/month in recoverable costs") but also the context — which season you're in, what that means for idle patterns, and how your fleet's idle rate compares to NRCan's FleetSmart benchmark of 15%. A number without context is just a number. "Your fleet idles at 9%, which is within the NRCan target" — that's information a manager can act on.
+**Executive Summary** opens with a fleet health score based on up to 365 days of data (23 days in the demo database). It tells you the headline number ("$12,443/month in recoverable costs") but also the context — which season you're in, what that means for idle patterns, and how your fleet's idle rate compares to NRCan's FleetSmart benchmark of 15%. A number without context is just a number. "Your fleet idles at 9%, which is within the NRCan target" — that's information a manager can act on.
 
 **Four Finding Cards** break the money down into categories. Ghost Vehicles flags units used less than 40% of available days — not based on a fixed 30-day window, but calculated from each vehicle's actual first trip date, so new vehicles don't get falsely flagged. Idle Time Burn calculates fuel cost at $4.30/hour using real trip-level idling durations from the Geotab API. High-Risk Driving flags vehicles with exception event counts above 2× the fleet average, and it actually looks at what TYPE of events they are — engine fault exceptions vs harsh braking vs speeding — because the response is completely different for each. Breakdown Risk catches vehicles with 3+ recurring mechanical fault codes in the analysis window. Each card shows dollar amounts so the conversation isn't "we have a problem" — it's "this problem costs us $X."
 
@@ -61,7 +61,7 @@ The reason the fault codes matter: without them, a maintenance coordinator gets 
 
 **Device Noise Detection** is the feature that came from cross-validating against official Geotab reports. Three vehicles (Demo-39, 40, 41) had massive fault counts — my tool originally classified them as mechanical failures needing a mechanic. The official Fault Report showed they were all accelerometer mounting issues. Pure device noise. The tool now runs a 3-way classifier on every fault: MECHANICAL (engine/coolant/transmission → send to mechanic), DEVICE ISSUE (accelerometer/disabled → call IT, $0 fix), or BEHAVIORAL (speeding/harsh events → driver coaching). Without this, fleet managers would send $400 mechanics to fix $0 firmware problems. The v2.0 update caught a fourth vehicle (Demo-42) that had the same accelerometer noise but fell below the exception threshold — proving the classifier needed to scan all vehicles, not just high-event ones.
 
-**Sustainability Card** converts idle hours to CO₂ tonnes and maps them against Canadian regulations — Clean Fuel Regulations (still in effect, SOR/2022-140), provincial carbon pricing ($65-170/tonne depending on province), ISSB S2 climate disclosures via CSA, and government contract bid requirements. This isn't generic "ESG is important" — it's specific to what a Canadian fleet operator actually faces in 2026. Includes a reduction scenario table showing what a 30% and 65% idle reduction would save in fuel, CO₂, and dollars.
+**Sustainability Card** converts idle hours to CO₂ tonnes and maps them against Canadian regulations — Clean Fuel Regulations (still in effect, SOR/2022-140), provincial carbon pricing ($65-170/tonne depending on province), ISSB S2 climate disclosures via CSA, and government contract bid requirements. All specific to what a Canadian fleet operator actually faces in 2026. Includes a reduction scenario table showing what a 30% and 65% idle reduction would save in fuel, CO₂, and dollars.
 
 **Evidence Report** is the per-vehicle backup for everything above. Each flagged vehicle gets its own card with trip-level data, idle peak hours (detected in 3-hour bins — so you know if someone is idling at 2 AM for warm-up or at noon for lunch breaks), fault code history with dates, and exception event timelines. This is what the fleet manager opens when their boss asks "how do you know Demo-31 is a problem?"
 
@@ -367,17 +367,15 @@ Note on Demo-15 idle (7.9 hrs vs Geotab's 7.6): this is rounding accumulation ac
 
 ## Known Limitations & Improvement Plan
 
-Shipping the tool in its current state, I can see where the data presentation oversimplifies or could mislead. A fleet manager reading this daily — or a judge who knows Geotab — would catch these. Better I call them out first.
-
 ### 1. "Mechanical, NOT driver behavior" is too absolute
 
 Demo-32's card says "Mechanical, NOT driver behavior" — but the event breakdown right below it shows Speeding:2 and Max Speed:1. Three of seven events ARE driver behavior. The classifier picks the dominant event type and stamps the whole card, which works when it's 15 engine faults and 1 speeding event (like Demo-39), but breaks down when the split is closer to 50/50.
 
-**Improvement:** Replace the binary label with a split classification. "4 of 7 events are mechanical (Engine Fault Exception, Engine Light On). 3 of 7 are behavioral (Speeding, Max Speed). Primary action: mechanic. Secondary action: driver coaching." This gives the fleet manager the full picture instead of forcing one label.
+**Improvement:** Replace the binary label with a split classification. "4 of 7 events are mechanical (Engine Fault Exception, Engine Light On). 3 of 7 are behavioral (Speeding, Max Speed). Primary action: mechanic. Secondary action: driver coaching."
 
 ### 2. Urgency level doesn't match fault severity
 
-Demo-32 has "Low Priority Warning Light × 2" — the word "Low Priority" is literally in the diagnostic code name. But the URGENT banner says "Pull from service. Book diagnostic." and prices it at "$400 proactive vs $1,200-$3,500 breakdown." That's an appropriate response for a high-priority fault or a check-engine light, not necessarily for two low-priority warnings over 22 days.
+Demo-32 has "Low Priority Warning Light × 2" — the word "Low Priority" is literally in the diagnostic code name. But the URGENT banner says "Pull from service. Book diagnostic." and prices it at "$400 proactive vs $1,200-$3,500 breakdown." That's an appropriate response for a high-priority fault or a check-engine light, not necessarily for two low-priority warnings over 23 days.
 
 **Improvement:** Parse the fault code severity from the diagnostic name. "Low Priority" → schedule inspection within 30 days. "Malfunction Indicator Lamp" or "Engine Coolant Temperature" → pull from service now. The $400 vs $3,500 framing should only appear for high-severity faults. Low-priority faults should say something like "Monitor — schedule next routine service" with a lower cost estimate.
 
@@ -389,15 +387,15 @@ Demo-39's accelerometer mounting issue sits next to Demo-32's engine faults unde
 
 ### 4. Cost estimates are hardcoded, not data-driven
 
-Every mechanical vehicle gets "$400 inspection avoids $1,200-$3,500 breakdown" regardless of fault type or severity. Every ghost vehicle gets "$800/mo" regardless of vehicle class. These are reasonable industry averages (CAA breakdown data, typical lease costs), but a fleet manager with actual lease numbers would immediately notice if their vehicles cost $600 or $1,200/mo.
+Every mechanical vehicle gets "$400 inspection avoids $1,200-$3,500 breakdown" regardless of fault type or severity. Every ghost vehicle gets "$800/mo" regardless of vehicle class. Industry averages (CAA breakdown data, typical lease costs), but a fleet manager with actual lease numbers would immediately notice if their vehicles cost $600 or $1,200/mo.
 
-**Improvement:** Allow user-configurable cost inputs — actual lease rate, hourly shop rate, fuel price. Even a simple settings panel with 3 fields would make every dollar amount in the report match the fleet manager's reality instead of industry averages.
+**Improvement:** Allow user-configurable cost inputs — actual lease rate, hourly shop rate, fuel price. Three fields and every dollar amount in the report becomes real.
 
-### 5. 22-day sample extrapolated to annual
+### 5. 23-day sample extrapolated to annual
 
-The executive summary projects $130,115/year from a 22-day sample. The tool flags this ("22d sample — run quarterly for higher confidence") but the annual number is still prominent. Seasonal patterns — winter idle is higher than summer, fleet utilization varies by quarter — mean the projection could be off by 20-30%.
+The executive summary projects $149,315/year from a 23-day sample. The tool flags this ("23d sample — run quarterly for higher confidence") but the annual number is still prominent. Seasonal patterns — winter idle is higher than summer, fleet utilization varies by quarter — mean the projection could be off by 20-30%.
 
-**Improvement:** Suppress the annual estimate when the sample is under 60 days. Show it only after 2+ quarterly runs, with a confidence range instead of a point estimate. "Based on 22 days: $10,843/mo. Annual estimate requires 90+ days of data."
+**Improvement:** Suppress the annual estimate when the sample is under 60 days. Show it only after 2+ quarterly runs, with a confidence range instead of a point estimate. "Based on 23 days: $12,443/mo. Annual estimate requires 90+ days of data."
 
 ### 6. Demo-15 idle rounding (7.9 vs 7.6 hrs)
 
@@ -407,7 +405,7 @@ The tool calculates idle from trip-level `idlingDuration` strings parsed client-
 
 ---
 
-None of these break the tool's core value — telling a fleet manager WHO does WHAT by WHEN. But each one represents a gap between "demo-ready" and "production-ready." If I had another sprint, items 1-3 would be the priority because they affect how a fleet manager interprets the action plan. Items 4-6 are accuracy refinements that matter more at scale.
+If I had another sprint, items 1-3 first — they affect how someone reads the action plan. Items 4-6 matter more at scale.
 
 ---
 
@@ -427,6 +425,7 @@ None of these break the tool's core value — telling a fleet manager WHO does W
 |---|---|---|
 | Geotab Add-In Architect Gem | ~50 | Code generation, feature additions, bug fixes, full version upgrades |
 | Claude | ~20 | Strategy, data validation, device noise fix, rebrand, sustainability, readability, truncation fix |
+| HeyGen | — | AI voiceover and video production for demo video |
 | **Total** | **~70** | |
 
 ---
