@@ -20,6 +20,20 @@ Twelve categories. 39 productivity reports. 29 maintenance reports. 14 safety re
 
 The gap between "seeing the numbers" and "knowing what to do" costs real money. For this demo fleet of 50 vehicles, that gap is **$10,843/month.**
 
+### Why Not Just Use the Built-In Fleet Utilization Report?
+
+Fair question. MyGeotab already ships a Fleet Utilization Report and it does its job well — it gives you total distance per vehicle, groups them into distance bands, and covers a long date range. For this demo fleet, it shows all 50 vehicles ranked from Demo-42 at 253 km up to Demo-43 at 2,551 km, bucketed into five distance tiers.
+
+That's useful context. But it answers one question: *how far did each vehicle drive?*
+
+It doesn't tell you why Demo-42 drove so little — is it underutilized, or did it just join the fleet last week? It doesn't surface that Demo-31 drove plenty of kilometers but idled for 8 hours. It doesn't flag the four vehicles throwing hundreds of accelerometer exceptions that look like mechanical failures but are actually device mounting issues. And it doesn't tell you who should act on any of it, what it's costing, or by when.
+
+The built-in report also has columns for up to 6 exception types — duration, count, and distance for each — but in practice those columns came back empty for this fleet. The data exists in MyGeotab; it just lives in separate reports (Fault Report, Exception Report, Trip History) that a fleet manager would need to open individually and cross-reference manually.
+
+Fleet Cost Optimizer pulls from 5 API endpoints in a single call — Trips, FaultData, ExceptionEvents, Devices, and Diagnostics — and does that cross-referencing automatically. It calculates utilization as a percentage of active days since each vehicle's first trip (not raw km), separates mechanical faults from device noise, attaches dollar amounts to every finding, and assigns each action to a specific person with a deadline.
+
+The built-in reports are the foundation. This tool is what sits on top — turning that data into a plan someone can actually execute.
+
 ---
 
 ## 🟢 What Fleet Cost Optimizer Does
