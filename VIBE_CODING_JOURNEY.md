@@ -8,7 +8,7 @@ Two tools did the heavy lifting: the **Geotab Add-In Architect Gem** (Google Gem
 
 ## Where the Idea Came From
 
-I've dealt with fleet operations enough to know the biggest gap: every tool shows you the data, but nobody tells you what to actually do about it. MyGeotab has great dashboards — idle hours, exception counts, fault codes — but a fleet manager still has to figure out "okay, so who do I call? What do I tell them? By when?"
+I've dealt with fleet operations enough to know the biggest gap: the data is there, but it's scattered across too many reports. MyGeotab has great dashboards — idle hours, exception counts, fault codes — but a fleet manager has to open 5-6 of them and cross-reference manually to get to "okay, Demo-32 has recurring faults, it's mechanical not behavioral, and here are the codes the mechanic needs." That cross-referencing takes time nobody has.
 
 That's what I wanted to build. Not another dashboard. A tool that says: "Demo-31 is your worst idler at 8 hours. The peak is evening — 9 PM to midnight. Assign your ops coordinator to implement engine-off policy by Day 14. Measure weekly."
 
@@ -44,18 +44,18 @@ One click → 30 seconds → a full report that a fleet manager can print and ha
 
 **Four Finding Cards** break the money down into categories. Ghost Vehicles flags units used less than 40% of available days — not based on a fixed 30-day window, but calculated from each vehicle's actual first trip date, so new vehicles don't get falsely flagged. Idle Time Burn calculates fuel cost at $4.30/hour using real trip-level idling durations from the Geotab API. High-Risk Driving flags vehicles with exception event counts above 2× the fleet average, and it actually looks at what TYPE of events they are — engine fault exceptions vs harsh braking vs speeding — because the response is completely different for each. Breakdown Risk catches vehicles with 3+ recurring mechanical fault codes in the analysis window. Each card shows dollar amounts so the conversation isn't "we have a problem" — it's "this problem costs us $X."
 
-**The Roadmap** is the part I spent the most time on and it's what makes this different from a dashboard. Look at the screenshot — Demo-32 has 7 events at 2.3× the fleet average. The tool doesn't just say "high risk." It says:
+**The Roadmap** is the part I spent the most time on and it's what makes this different from a dashboard. Look at the screenshot — Demo-32 has 7 events at 2.3× the fleet average. Instead of just "high risk," the card already has everything cross-referenced:
 
-- **Who:** Maintenance Coordinator (not the fleet manager, not the driver — the specific role)
+- **Routed to:** Maintenance Coordinator (mechanical finding, not behavioral)
 - **Action:** Pull from service. Book diagnostic. Mechanical, NOT driver behavior — coaching will not fix engine faults.
 - **Diagnostic Codes:** Low Priority Warning Light (×2) — pulled from actual Geotab FaultData records, resolved to human-readable names instead of internal IDs
-- **Pattern analysis:** Single recurring code — tells the mechanic to focus on this system instead of doing a full inspection
+- **Pattern analysis:** Single recurring code — points to one system rather than a scattershot of unrelated faults
 - **Event breakdown:** Engine Fault Exception:2, Engine Light On:2, Speeding:2, Max Speed:1 — so you can see it's mostly mechanical, not driving behavior
 - **MyGeotab link:** "MyGeotab → Faults → Demo - 32" — tells you exactly where to verify in the platform
 - **Cost:** ~$400 proactive inspection
 - **Savings:** Avoids $1,200-$3,500 roadside breakdown
 
-That's one action card. The Roadmap has four phases — URGENT (this week) for safety and mechanical issues, 30-day for idle reduction and driver coaching, 60-day for measurement and fleet right-sizing decisions, and 90-day for SOPs and ongoing monitoring. Each phase has a dollar target showing how waste should decrease. There's a progress tracker table at the bottom and a printable checklist with every vehicle name.
+That's one action card. The Roadmap has four phases — URGENT (this week) for safety and mechanical issues, 30-day for idle reduction and driver coaching, 60-day for measurement and fleet right-sizing decisions, and 90-day for SOPs and ongoing monitoring. Each phase has a dollar target showing how costs should decrease. There's a progress tracker table at the bottom and a printable checklist with every vehicle name.
 
 The reason the fault codes matter: without them, a maintenance coordinator gets "Demo-32 has problems, go look." With them, they walk into the shop and say "Low Priority Warning Light, recurring — check the emissions system." That's the difference between a 2-hour diagnostic fishing expedition and a 30-minute targeted inspection.
 
@@ -403,9 +403,15 @@ The tool calculates idle from trip-level `idlingDuration` strings parsed client-
 
 **Improvement:** Round trip-level idle to the nearest minute before summing (matching Geotab's approach), or display the variance note on vehicles where the tool's count exceeds the API's aggregate by >3%.
 
+### 7. No automated distribution
+
+The audit already organizes findings by role — maintenance coordinator, IT, fleet manager. But someone still has to run it, read it, and forward the relevant parts to the right people. That's a manual bottleneck.
+
+**Improvement:** N8N workflow integration. After an audit runs, a webhook pushes the structured results into N8N, which routes findings to the right person automatically. URGENT mechanical flags go straight to the maintenance coordinator's inbox. Device noise tickets go to IT. The fleet manager gets a weekly digest with cost trends and roadmap progress. If idle hours haven't dropped 20% by Day 30, an escalation notification fires before anyone has to remember to check. The data is already structured by role — it just needs a delivery layer.
+
 ---
 
-If I had another sprint, items 1-3 first — they affect how someone reads the action plan. Items 4-6 matter more at scale.
+If I had another sprint, items 1-3 first — they affect how someone reads the action plan. Item 7 (N8N) would be next because it closes the loop between "audit generated" and "right person sees it." Items 4-6 matter more at scale.
 
 ---
 

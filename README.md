@@ -2,7 +2,7 @@
 
 **A MyGeotab Add-In that audits your fleet and builds a 90-day action plan.**
 
-One click. 30 seconds. Tells your fleet manager exactly who to call, what to fix, and by when — with dollar amounts attached.
+One click. 30 seconds. Pulls from 5 API endpoints, cross-references everything, and hands your fleet manager a ready-to-act report — findings, fault codes, cost estimates, and a 90-day plan.
 
 ![Version](https://img.shields.io/badge/version-2.0-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-MyGeotab-orange)
 
@@ -97,15 +97,15 @@ Demo-19 has 4 recurring fault codes (Low Priority Warning Light × 4, spanning J
 
 ## The Roadmap — What Makes This Different
 
-Most fleet tools stop at the finding cards. A fleet manager knows Demo-32 has issues — but WHO pulls it from service? WHO calls the mechanic? What fault codes do they mention? When is it due? How do they verify?
+Most fleet tools stop at the finding cards. The fleet manager already knows what to do with a problem vehicle — but getting there means opening the Fault Report, cross-referencing Trip History, checking Exception Events, and piecing together whether it's mechanical, device-related, or driver behavior. That takes time. The Roadmap does that cross-referencing upfront and organizes everything by urgency, so the fleet manager can act on it immediately.
 
-Four phases, each with a dollar target showing how waste should decrease.
+Four phases, each with a dollar target showing how costs should decrease.
 
 ### URGENT: Safety & Mechanical (This Week)
 
 ![Roadmap URGENT](screenshots/09-roadmap-urgent.png)
 
-Every card names **who** (Maintenance Coordinator), **what** (pull from service, book diagnostic), and includes the data to back it up. Demo-32: Diagnostic Codes (2): Low Priority Warning Light ×2, pattern analysis ("single recurring code — mechanic should focus on this system"), full event breakdown, and the MyGeotab navigation path: `MyGeotab → Faults → Demo - 32`.
+Findings are organized by role — maintenance coordinator, IT, fleet manager — with the data already attached. Demo-32: Diagnostic Codes (2): Low Priority Warning Light ×2, pattern analysis ("single recurring code — points to one system"), full event breakdown, and the MyGeotab navigation path: `MyGeotab → Faults → Demo - 32`.
 
 Below the mechanical cards, the DEVICE ISSUE cards (Demo-39, 40, 41, 42) route to IT instead of a mechanic: "NOT an engine fault. Geotab GO device: 111 accelerometer noise records." $0 fix under warranty. Without the 3-way classifier, fleet managers send $400 mechanics to fix firmware problems.
 
@@ -184,6 +184,8 @@ What I'd build next:
 **Configurable cost inputs.** A settings panel where you enter your actual lease rate, hourly shop rate, and fuel price. Three fields and every dollar amount in the report becomes real.
 
 **Ace API chat panel.** A conversational interface where a fleet manager asks "which vehicles should I look at first?" and gets a prioritized answer. Attempted 11 times during development — failed every time due to the 50KB Add-In size constraint. The Ace SDK alone would push past the limit. Would need a server-side architecture change to make this work.
+
+**N8N workflow integration.** The audit already organizes findings by role — maintenance coordinator, IT, fleet manager. N8N could route those findings directly to the right person. URGENT mechanical flags go to the maintenance coordinator's inbox immediately. Device noise tickets go to IT. The fleet manager gets a weekly digest with cost trends and roadmap progress. Escalation triggers fire automatically — if idle hours haven't dropped 20% by Day 30, the fleet manager gets a nudge before it stalls. The audit data is already structured for this; it just needs a webhook endpoint and an N8N flow to distribute it.
 
 **Suppress annual estimate under 60 days.** Show it only after 2+ quarterly runs, with a confidence range instead of a point estimate.
 
