@@ -1,6 +1,6 @@
 # Fleet Cost Optimizer
 
-**A MyGeotab Add-In that turns raw telematics data into a prescriptive 90-day action plan.**
+**A MyGeotab Add-In that audits your fleet and builds a 90-day action plan.**
 
 One click. 30 seconds. Tells your fleet manager exactly who to call, what to fix, and by when — with dollar amounts attached.
 
@@ -21,9 +21,9 @@ MyGeotab has over 100 built-in reports. Here's what a fleet manager sees when th
 
 ![MyGeotab Reports Dashboard](screenshots/00-mygeotab-reports.png)
 
-Twelve categories. 39 productivity reports. 29 maintenance reports. 14 safety reports. Each one answers a single question — "which vehicles were idling?" or "who had fault codes?" — but none of them connect the dots. A fleet manager has to open 5-6 different reports, mentally cross-reference the data, figure out which findings actually matter, decide who should handle each one, and then somehow track whether anything got done.
+Twelve categories. 39 productivity reports. 29 maintenance reports. 14 safety reports. Each one answers a single question — "which vehicles were idling?" or "who had fault codes?" — but none of them connect the dots. To actually act on this data, a fleet manager has to open 5-6 reports, cross-reference them manually, figure out what matters, decide who handles it, and somehow track whether anything got done.
 
-The gap between "seeing the numbers" and "knowing what to do" costs real money. For this demo fleet of 50 vehicles, that gap is **$12,443/month.**
+That gap — between seeing the numbers and knowing what to do — costs real money. For this demo fleet of 50 vehicles, it's **$12,443/month.**
 
 > *"Why not just use the built-in Fleet Utilization Report?"* — See [Appendix A](#appendix-a-fleet-utilization-report-comparison) for a side-by-side comparison.
 
@@ -31,61 +31,61 @@ The gap between "seeing the numbers" and "knowing what to do" costs real money. 
 
 ## What Fleet Cost Optimizer Does
 
-One button replaces those 5-6 reports with a single audit that tells you what's wrong, how much it costs, who fixes it, and by when.
+One button replaces those 5-6 reports with a single audit — what's wrong, what it costs, who owns the fix, and when it's due.
 
 ### Executive Summary
 
 ![Executive Summary](screenshots/01-executive-summary.png)
 
-The first thing a fleet manager sees after clicking "Run Audit." Version, date, analysis window (23 days across 2 months), and the headline: **$12,443 CAD/month in recoverable costs.** Three layers of context below:
+The first thing you see after clicking "Run Audit." Version, date, analysis window (23 days across 2 months), and the headline: **$12,443 CAD/month in recoverable costs.** Below that:
 
 - **Canadian Winter:** NRCan recommends 3-5 min warm-up max for modern diesels. Top idler at 8.0 hrs is well beyond cold-weather needs.
-- **Benchmarks:** Fleet idle rate 9% — within NRCan's 15% target. Good news the tool surfaces, not just problems.
-- **Key Findings:** 13 ghost vehicles, 2 mechanical issues, **4 device issues** (not engine problems — Geotab device reinstall). The summary already separates mechanical from device so a fleet manager doesn't waste a mechanic on a firmware fix.
+- **Benchmarks:** Fleet idle rate 9% — within NRCan's 15% target. Worth noting it's not all bad news.
+- **Key Findings:** 13 ghost vehicles, 2 mechanical issues, **4 device issues** (not engine problems — Geotab device reinstall). Mechanical and device are split right in the summary so nobody wastes a mechanic on a firmware fix.
 
-The yellow warning at the bottom is the tool being honest: "Tool requested 365 days of history — database contains 23 days."
+The yellow warning at the bottom flags the data gap: "Tool requested 365 days of history — database contains 23 days."
 
 ### Sustainability & Carbon Impact
 
 ![Sustainability Card](screenshots/02-sustainability.png)
 
-Not generic "ESG is important" — specific to what a Canadian fleet operator faces in 2026. Four regulatory frameworks mapped: Clean Fuel Regulations (SOR/2022-140, still in effect), provincial carbon pricing (BC carbon tax + Quebec cap-and-trade), government contract ESG requirements, and ISSB S2 climate disclosure via CSA.
+Mapped to what a Canadian fleet operator actually deals with in 2026. Four regulatory frameworks: Clean Fuel Regulations (SOR/2022-140, still in effect), provincial carbon pricing (BC carbon tax + Quebec cap-and-trade), government contract ESG requirements, and ISSB S2 climate disclosure via CSA.
 
-The carbon footprint table translates idle hours into numbers a CFO can use: 511L fuel/month, 1.4 tonnes CO₂, $628 CAD. The reduction scenarios show what 30% and 65% cuts would save. The equivalency bar at the bottom — "642 trees" and "4.7 passenger cars" — is for the sustainability report.
+The carbon footprint table breaks idle hours into 511L fuel/month, 1.4 tonnes CO₂, $628 CAD. Reduction scenarios show what 30% and 65% cuts look like. The "642 trees" and "4.7 passenger cars" equivalencies at the bottom are there for sustainability reporting.
 
 ### Monthly Idle Trend
 
 ![Monthly Idle Trend](screenshots/03-idle-trend.png)
 
-Bars show idle hours by month, color-coded by season. With only 2 months of data (Jan: 4h, Feb: 142h), the trend is steep — but the pink "Data Maturity" callout explains why. It even schedules the next audit for May 23, 2026. The tool doesn't pretend 23 days is enough for seasonal comparison.
+Bars show idle hours by month, color-coded by season. With only 2 months of data (Jan: 4h, Feb: 142h), the trend is steep — but the pink "Data Maturity" callout explains why. Next audit is scheduled for May 23, 2026. 23 days isn't enough for seasonal comparison and the tool says so.
 
 ### Total Opportunity
 
 ![Total Opportunity](screenshots/04-total-opportunity.png)
 
-The anchor number. $12,443 CAD/month. The annual estimate ($149,315) is deliberately caveated: "23d sample — run quarterly for higher confidence." Everything below links back to specific actions in the Roadmap.
+The anchor number. $12,443 CAD/month. The annual estimate ($149,315) comes with a warning: "23d sample — run quarterly for higher confidence."
 
 ### The Four Finding Cards
 
-Each card is one category of recoverable cost, ranked by impact.
+Four categories of recoverable cost, ranked by impact.
 
 #### Ghost Vehicles — $10,400/mo
 
 ![Ghost Vehicles](screenshots/05-ghost-vehicles.png)
 
-13 of 50 vehicles below 40% utilization. At $800/mo each (lease + insurance), these are the biggest opportunity. The table shows utilization %, km driven, and cost-per-km so a fleet manager can see that Demo-10 at 22% and $3/km is the worst offender. Utilization is calculated from each vehicle's actual first trip date — not a fixed 30-day window — so new vehicles don't get falsely flagged.
+13 of 50 vehicles below 40% utilization. At $800/mo each (lease + insurance), these are the biggest line item. Demo-10 at 22% utilization and $3/km is the worst offender. Utilization is calculated from each vehicle's actual first trip date — not a fixed 30-day window — so a vehicle that joined the fleet last week doesn't get falsely flagged.
 
 #### Idle Time Burn — $243/mo
 
 ![Idle Time Burn](screenshots/06-idle-burn.png)
 
-Demo-31 leads at 8.0 hours. The description identifies the pattern — peak patterns show midday dwell — so the fleet manager knows this needs an engine-off policy. Fuel cost calculated at $4.30/hour using real trip-level idling durations from the Geotab API.
+Demo-31 leads at 8.0 hours. Peak idle happens midday, so this needs an engine-off policy, not a block heater. Fuel cost calculated at $4.30/hour using real trip-level idling durations from the Geotab API.
 
 #### High-Risk Driving — $1,000/mo
 
 ![High-Risk Driving](screenshots/07-high-risk.png)
 
-5 vehicles exceed 2× the fleet safety average. The card already calls out "**4 device noise issues found**" right in the description — so nobody confuses accelerometer mounting problems with dangerous driving. Demo-39 at 6.2× average looks alarming until you realize 15 of its 19 events are device-generated Engine Fault Exceptions, not actual driving behavior.
+5 vehicles exceed 2× the fleet safety average. "**4 device noise issues found**" is flagged right in the description — so nobody confuses accelerometer mounting problems with dangerous driving. Demo-39 at 6.2× average looks alarming until you realize 15 of its 19 events are device-generated Engine Fault Exceptions, not actual driving behavior.
 
 #### Breakdown Risk — $800/mo
 
@@ -97,17 +97,17 @@ Demo-19 has 4 recurring fault codes (Low Priority Warning Light × 4, spanning J
 
 ## The Roadmap — What Makes This Different
 
-Most fleet tools stop at the finding cards. Here's the problem with that: a fleet manager knows Demo-32 has issues, but WHO pulls it from service? WHO calls the mechanic? What fault codes do they mention? When is it due? How do they verify?
+Most fleet tools stop at the finding cards. A fleet manager knows Demo-32 has issues — but WHO pulls it from service? WHO calls the mechanic? What fault codes do they mention? When is it due? How do they verify?
 
-The Roadmap answers all of that. Four phases, each with a dollar target showing how waste should decrease.
+Four phases, each with a dollar target showing how waste should decrease.
 
 ### URGENT: Safety & Mechanical (This Week)
 
 ![Roadmap URGENT](screenshots/09-roadmap-urgent.png)
 
-Each card names **who** (Maintenance Coordinator), **what** (pull from service, book diagnostic), and backs it with data. Demo-32 shows Diagnostic Codes (2): Low Priority Warning Light ×2, with pattern analysis ("single recurring code — mechanic should focus on this system") and the full event breakdown. The MyGeotab navigation path tells the coordinator exactly where to verify: `MyGeotab → Faults → Demo - 32`.
+Every card names **who** (Maintenance Coordinator), **what** (pull from service, book diagnostic), and includes the data to back it up. Demo-32: Diagnostic Codes (2): Low Priority Warning Light ×2, pattern analysis ("single recurring code — mechanic should focus on this system"), full event breakdown, and the MyGeotab navigation path: `MyGeotab → Faults → Demo - 32`.
 
-Below the mechanical cards, the DEVICE ISSUE cards (Demo-39, 40, 41, 42) route to IT instead of a mechanic: "NOT an engine fault. Geotab GO device: 111 accelerometer noise records." $0 fix under warranty. This is the 3-way classifier in action — without it, fleet managers send $400 mechanics to fix firmware problems.
+Below the mechanical cards, the DEVICE ISSUE cards (Demo-39, 40, 41, 42) route to IT instead of a mechanic: "NOT an engine fault. Geotab GO device: 111 accelerometer noise records." $0 fix under warranty. Without the 3-way classifier, fleet managers send $400 mechanics to fix firmware problems.
 
 ### 30-Day Plan: Quick Wins
 
@@ -119,7 +119,7 @@ Target: $12,443 → $11,570. Five action cards, each with a different owner. Ant
 
 ![60-Day Plan](screenshots/11-60day-plan.png)
 
-Target: $6,221 (50% reduction). Compare before and after. The red "If stuck" escalation paths are built in — "If idle NOT down 20%: escalate to GPS idle alerts." "No improvement after 30d → progressive discipline." Ghost Review forces a keep/share/remove decision on all 13 underused vehicles. Each card includes what to do when progress stalls, not just the happy path.
+Target: $6,221 (50% reduction). Compare before and after. The red "If stuck" escalation paths are built in — "If idle NOT down 20%: escalate to GPS idle alerts." "No improvement after 30d → progressive discipline." Ghost Review forces a keep/share/remove decision on all 13 underused vehicles.
 
 ### 90-Day Plan: Systematize
 
@@ -137,27 +137,25 @@ Expected metrics at each phase. Recoverable cost declining from $12,443 to $4,35
 
 ![Checklist](screenshots/14-checklist.png)
 
-Every action from the roadmap as a checkbox, grouped by URGENT, Month 1, Month 2, Month 3. Print this page, hand it to your team, track completion with a pen. This is what turns a dashboard into an operations tool.
+Every action from the roadmap as a checkbox, grouped by URGENT, Month 1, Month 2, Month 3. Print it, hand it to your team, track completion with a pen.
 
 ---
 
 ## Evidence Report
 
-Data backing every finding. When the boss asks "how do you know Demo-31 is a problem?" — open this section.
+Raw data behind every finding. When someone asks "how do you know Demo-31 is a problem?" — this is what you show them.
 
 ![Evidence - Idle Details](screenshots/15-evidence-idle.png)
 
-Fleet Overview shows utilization distribution (1 vehicle at 0-25%, 15 at 25-50%, 21 at 50-75%, 13 at 75-100%). Each idle vehicle gets trip-level detail — Demo-31's peak is **21:00-00:00** (73% of idle happens evening, not warm-up). The trip table shows individual high-idle trips with date, idle duration, and what percentage of that trip was idle.
+Fleet Overview: utilization distribution (1 vehicle at 0-25%, 15 at 25-50%, 21 at 50-75%, 13 at 75-100%). Each idle vehicle gets trip-level detail — Demo-31's peak is **21:00-00:00** (73% of idle happens evening, not warm-up). Individual high-idle trips with date, idle duration, and what percentage of that trip was idle.
 
 ![Evidence - High Risk Details](screenshots/16-evidence-highrisk.png)
 
-Demo-39's evidence: 19 events, wall-to-wall Engine Fault Exception at 2-5 AM, tagged "Device noise." The timestamps and durations make it obvious this is automated sensor noise, not a driver speeding at 3 AM. This is the evidence that convinced me to build the 3-way classifier.
+Demo-39: 19 events, wall-to-wall Engine Fault Exception at 2-5 AM, tagged "Device noise." Nobody's speeding at 3 AM — this is automated sensor noise. Seeing this pattern is what convinced me to build the 3-way classifier.
 
 ---
 
 ## Known Limitations
-
-Shipping the tool in its current state, there are places where the data presentation oversimplifies or could mislead. A fleet manager reading this daily — or a judge who knows Geotab — would catch these. Better to call them out.
 
 **1. "Mechanical, NOT driver behavior" is too absolute.** Demo-32's card says "Mechanical, NOT driver behavior" — but the event breakdown shows Speeding:2 and Max Speed:1. Three of seven events ARE driver behavior. The classifier picks the dominant type and stamps the whole card, which breaks down when the split is close to 50/50.
 
@@ -165,7 +163,7 @@ Shipping the tool in its current state, there are places where the data presenta
 
 **3. Device issues and mechanical issues share the same URGENT banner.** Demo-39's $0 IT ticket sits next to Demo-32's engine faults under the same red header. Mixing them dilutes the real urgency of mechanical flags.
 
-**4. Cost estimates are hardcoded.** Every mechanical vehicle gets "$400 inspection avoids $1,200-$3,500 breakdown" regardless of severity. Every ghost vehicle gets "$800/mo" regardless of vehicle class. These are reasonable industry averages but won't match every fleet's actual numbers.
+**4. Cost estimates are hardcoded.** Every mechanical vehicle gets "$400 inspection avoids $1,200-$3,500 breakdown" regardless of severity. Every ghost vehicle gets "$800/mo" regardless of vehicle class. Industry averages, not fleet-specific numbers.
 
 **5. 23-day sample extrapolated to annual.** The tool flags this ("23d sample — run quarterly") but the $149,315 annual projection is still prominent. Seasonal variation could make it 20-30% off.
 
@@ -175,15 +173,15 @@ Shipping the tool in its current state, there are places where the data presenta
 
 ## Future Roadmap
 
-What I'd build with another sprint, ranked by impact on fleet manager experience:
+What I'd build next:
 
-**Split classification on action cards.** Replace the binary "Mechanical, NOT driver behavior" with "4 of 7 mechanical, 3 of 7 behavioral. Primary: mechanic. Secondary: coaching." Give the fleet manager the full picture.
+**Split classification on action cards.** Replace the binary "Mechanical, NOT driver behavior" with "4 of 7 mechanical, 3 of 7 behavioral. Primary: mechanic. Secondary: coaching."
 
-**Severity-aware urgency tiers.** Parse fault code severity from the diagnostic name. "Low Priority Warning Light" → schedule at next routine service. "Malfunction Indicator Lamp" → pull from service now. Match the response to the actual risk.
+**Severity-aware urgency tiers.** Parse fault code severity from the diagnostic name. "Low Priority Warning Light" → schedule at next routine service. "Malfunction Indicator Lamp" → pull from service now.
 
 **Separate device issues from mechanical in the URGENT section.** Split into "⚠️ Mechanical — Pull from Service" (red) and "📱 Device Issues — IT Ticket" (purple). Device mounting issues aren't emergencies.
 
-**Configurable cost inputs.** A settings panel with actual lease rate, hourly shop rate, and fuel price. Three fields would make every dollar amount match the fleet manager's reality instead of industry averages.
+**Configurable cost inputs.** A settings panel where you enter your actual lease rate, hourly shop rate, and fuel price. Three fields and every dollar amount in the report becomes real.
 
 **Ace API chat panel.** A conversational interface where a fleet manager asks "which vehicles should I look at first?" and gets a prioritized answer. Attempted 11 times during development — failed every time due to the 50KB Add-In size constraint. The Ace SDK alone would push past the limit. Would need a server-side architecture change to make this work.
 
@@ -199,7 +197,7 @@ What I'd build with another sprint, ranked by impact on fleet manager experience
 
 **"Config not valid" — 15 consecutive failures.** Between v1.3 and v1.5, the Gem kept generating code that broke the MyGeotab config parser. Invisible characters, malformed JSON, size overruns. Each attempt required pasting the entire working version back in and describing only the additions. The lesson: small, incremental changes only.
 
-**Demo database limitations.** The simulator provides 23 days across 2 months. The tool requests 365 days and works with whatever comes back, but seasonal analysis requires data that doesn't exist yet. Every projection carries a caveat.
+**Demo database limitations.** The simulator provides 23 days across 2 months. The tool requests 365 days and works with whatever comes back, but seasonal analysis requires data that doesn't exist yet. Projections are flagged accordingly.
 
 **Idle rounding variance.** Geotab's server-side idle calculation doesn't match client-side parsing of trip-level `idlingDuration` strings. The ~4% variance (Demo-15: 7.9 vs 7.6 hrs) comes from fractional seconds accumulating across 254 trips. Not a bug, but a fleet manager comparing against MyGeotab's built-in report would notice the discrepancy.
 
@@ -275,6 +273,7 @@ Compared tool output against official Geotab reports:
 |---|---|---|
 | Geotab Add-In Architect Gem (Google Gemini) | ~50 | Code generation, feature additions, bug fixes, full version upgrades |
 | Claude (Anthropic) | ~20 | Strategy, data validation, device noise fix, sustainability, debugging |
+| HeyGen | — | AI voiceover and video production for demo video |
 | **Total** | **~70** | |
 
 Full prompt history: [`PROMPTS.md`](PROMPTS.md) and [`Google_Gem_History.txt`](Google_Gem_History.txt)
@@ -321,7 +320,7 @@ Demo-42 shows 253 km and you know it's low — but is that because it's been sit
 
 The data exists inside MyGeotab — idle time, fault codes, exception events — it's just spread across separate reports. A fleet manager would need to open the Fault Report, the Exception Report, Trip History, run them each individually, then mentally piece together which vehicles actually need attention and who should handle it.
 
-Fleet Cost Optimizer pulls Trips, FaultData, ExceptionEvents, Devices, and Diagnostics in one API call and does that cross-referencing for you. Utilization is calculated as a percentage of active days since each vehicle's first recorded trip — not just raw km. Faults get classified into mechanical vs. device noise so nobody sends a mechanic for a firmware problem. Every finding has a dollar amount, an owner, and a deadline.
+Fleet Cost Optimizer pulls Trips, FaultData, ExceptionEvents, Devices, and Diagnostics in one API call and does that cross-referencing for you. Utilization is calculated as a percentage of active days since each vehicle's first recorded trip — not just raw km. Faults get classified into mechanical vs. device noise so nobody sends a mechanic for a firmware problem. And every finding gets a dollar amount, an owner, and a deadline.
 
 ---
 
