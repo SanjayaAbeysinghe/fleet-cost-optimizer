@@ -20,19 +20,7 @@ Twelve categories. 39 productivity reports. 29 maintenance reports. 14 safety re
 
 The gap between "seeing the numbers" and "knowing what to do" costs real money. For this demo fleet of 50 vehicles, that gap is **$10,843/month.**
 
-### Why Not Just Use the Built-In Fleet Utilization Report?
-
-Fair question. MyGeotab already ships a Fleet Utilization Report and it does its job well — it gives you total distance per vehicle, groups them into distance bands, and covers a long date range. For this demo fleet, it shows all 50 vehicles ranked from Demo-42 at 253 km up to Demo-43 at 2,551 km, bucketed into five distance tiers.
-
-That's useful context. But it answers one question: *how far did each vehicle drive?*
-
-It doesn't tell you why Demo-42 drove so little — is it underutilized, or did it just join the fleet last week? It doesn't surface that Demo-31 drove plenty of kilometers but idled for 8 hours. It doesn't flag the four vehicles throwing hundreds of accelerometer exceptions that look like mechanical failures but are actually device mounting issues. And it doesn't tell you who should act on any of it, what it's costing, or by when.
-
-The built-in report also has columns for up to 6 exception types — duration, count, and distance for each — but in practice those columns came back empty for this fleet. The data exists in MyGeotab; it just lives in separate reports (Fault Report, Exception Report, Trip History) that a fleet manager would need to open individually and cross-reference manually.
-
-Fleet Cost Optimizer pulls from 5 API endpoints in a single call — Trips, FaultData, ExceptionEvents, Devices, and Diagnostics — and does that cross-referencing automatically. It calculates utilization as a percentage of active days since each vehicle's first trip (not raw km), separates mechanical faults from device noise, attaches dollar amounts to every finding, and assigns each action to a specific person with a deadline.
-
-The built-in reports are the foundation. This tool is what sits on top — turning that data into a plan someone can actually execute.
+> *"Why not just use the built-in Fleet Utilization Report?"* — See [Appendix A](#appendix-a-fleet-utilization-report-comparison) for a side-by-side comparison.
 
 ---
 
@@ -376,6 +364,20 @@ Full prompt history: [`PROMPTS.md`](PROMPTS.md) and [`Google_Gem_History.txt`](G
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+## Appendix A: Fleet Utilization Report Comparison
+
+I ran the Fleet Utilization Report on the same demo fleet to see what it gives you. Five tabs, 50 vehicles, 397-day date range. The core output is total distance per vehicle, bucketed into distance bands — Demo-42 at 253 km on the low end, Demo-43 at 2,551 km at the top. The Vehicle Count tab shows the distribution: 10 vehicles in the 201-500 km range, 21 in 501-1000, 19 over 1000.
+
+That's distance. That's all it has.
+
+Demo-42 shows 253 km and you know it's low — but is that because it's been sitting in a lot for a month, or because it joined the fleet last Tuesday? The report doesn't track when each vehicle started. Demo-31 shows 2,169 km and looks like a top performer — except it also idled 8 hours, which you'd only find in a completely different report. The four vehicles with hundreds of accelerometer exceptions? Not here. The report has columns for 6 exception types but they all came back empty for this fleet.
+
+The data exists inside MyGeotab — idle time, fault codes, exception events — it's just spread across separate reports. A fleet manager would need to open the Fault Report, the Exception Report, Trip History, run them each individually, then mentally piece together which vehicles actually need attention and who should handle it.
+
+Fleet Cost Optimizer pulls Trips, FaultData, ExceptionEvents, Devices, and Diagnostics in one API call and does that cross-referencing for you. Utilization is calculated as a percentage of active days since each vehicle's first recorded trip — not just raw km. Faults get classified into mechanical vs. device noise so nobody sends a mechanic for a firmware problem. Every finding has a dollar amount, an owner, and a deadline.
 
 ---
 
