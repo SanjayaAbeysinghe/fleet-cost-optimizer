@@ -8,7 +8,7 @@ One click. 30 seconds. Tells your fleet manager exactly who to call, what to fix
 
 <div align="center">
 
-### 🚀 [Watch the Interactive Intro →](https://github.com/SanjayaAbeysinghe/fco-intro-v2.html)
+### 🚀 [Watch the Interactive Intro →](https://sanjayaabeysinghe.github.io/fleet-cost-optimizer/fco-intro-v2.html)
 *60-second animated walkthrough — what the tool finds, how it classifies, and the 90-day plan it builds*
 
 </div>
