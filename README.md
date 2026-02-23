@@ -6,6 +6,13 @@ One click. 30 seconds. Tells your fleet manager exactly who to call, what to fix
 
 ![Version](https://img.shields.io/badge/version-2.0-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-MyGeotab-orange)
 
+<div align="center">
+
+### 🚀 [Watch the Interactive Intro →](https://github.com/SanjayaAbeysinghe/fco-intro-v2.html)
+*60-second animated walkthrough — what the tool finds, how it classifies, and the 90-day plan it builds*
+
+</div>
+
 ---
 
 ## 🔴 The Problem
@@ -271,7 +278,7 @@ Geotab's server-side idle calculation doesn't match client-side parsing of trip-
 5. **Save** → hard refresh (Ctrl+Shift+R)
 6. Find **"Fleet Cost Optimizer"** in the sidebar → click **Run Audit**
 
-No server. No API keys. No build step. The entire tool is a single HTML file embedded in a JSON config.
+No server. No API keys. No build step. You don't need to upload the HTML separately — the entire UI (HTML, CSS, JavaScript) is embedded inside the JSON config under the `"files"` key. One file does everything.
 
 ## Technical Architecture
 
@@ -342,6 +349,7 @@ Full prompt history: [`PROMPTS.md`](PROMPTS.md) and [`Google_Gem_History.txt`](G
 |---|---|
 | `fleet-cost-optimizer-v2.0.json` | The Add-In config. Paste into MyGeotab. |
 | `audit-v2.0.html` | Extracted HTML for reading the source code. |
+| `fco-intro-v2.html` | Interactive 60-second intro presentation. [Live version →](https://yourusername.github.io/fleet-cost-optimizer/fco-intro-v2.html) |
 | `README.md` | You're here. |
 | `VIBE_CODING_JOURNEY.md` | Full build story — version by version, every bug, every fix. |
 | `SUBMISSION_STORY.md` | Short-form submission description. |

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Cost Optimizer — Intro</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#050816;--card:rgba(15,23,42,0.8);--glass:rgba(255,255,255,0.03);
+--red:#ff3e3e;--green:#00ff88;--blue:#3b82f6;--purple:#a855f7;
+--orange:#ff8c00;--gold:#ffd700;--cyan:#00d4ff;--pink:#ff006e;
+--text:#f8fafc;--muted:#94a3b8;--dim:#475569;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow:hidden;width:100vw;height:100vh}
+
+/* ── COSMIC BACKGROUND ── */
+.cosmos{position:fixed;inset:0;z-index:0;overflow:hidden}
+.cosmos canvas{width:100%;height:100%}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:0.2;z-index:0;animation:orbFloat 8s ease-in-out infinite}
+.orb-1{width:500px;height:500px;background:var(--purple);top:-150px;left:-100px;animation-delay:0s}
+.orb-2{width:400px;height:400px;background:var(--cyan);bottom:-100px;right:-80px;animation-delay:-3s}
+.orb-3{width:300px;height:300px;background:var(--pink);top:40%;left:50%;animation-delay:-5s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,15px) scale(0.95)}}
+
+/* ── GRID OVERLAY ── */
+.grid-overlay{position:fixed;inset:0;z-index:1;
+background-image:linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+background-size:50px 50px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 70%)}
+
+/* ── SLIDES ── */
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+opacity:0;pointer-events:none;padding:50px 70px;z-index:10;transition:opacity 0.6s ease}
+.slide.active{opacity:1;pointer-events:auto}
+.slide.active .reveal{animation:revealUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards}
+.slide .reveal{opacity:0;transform:translateY(40px)}
+.reveal.d0{animation-delay:0s}.reveal.d1{animation-delay:0.15s}.reveal.d2{animation-delay:0.3s}
+.reveal.d3{animation-delay:0.45s}.reveal.d4{animation-delay:0.6s}.reveal.d5{animation-delay:0.75s}
+.reveal.d6{animation-delay:0.9s}.reveal.d7{animation-delay:1.05s}.reveal.d8{animation-delay:1.2s}
+@keyframes revealUp{to{opacity:1;transform:translateY(0)}}
+
+/* ── PROGRESS ── */
+.progress-track{position:fixed;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.05);z-index:100}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));transition:width 0.4s ease;box-shadow:0 0 20px var(--cyan)}
+.slide-num{position:fixed;bottom:20px;right:30px;font-family:'JetBrains Mono';font-size:11px;color:var(--dim);z-index:100;letter-spacing:3px}
+
+/* ── CONTROLS ── */
+.controls{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:100}
+.cb{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--muted);
+padding:6px 14px;border-radius:6px;cursor:pointer;font-family:'Space Grotesk';font-size:11px;transition:all 0.2s}
+.cb:hover{background:rgba(255,255,255,0.1);color:var(--text)}
+.cb.on{background:var(--green);color:#000;border-color:var(--green);font-weight:600}
+
+/* ── TYPOGRAPHY ── */
+.t-hero{font-family:'Sora';font-weight:800;font-size:clamp(52px,7vw,90px);line-height:1;letter-spacing:-3px}
+.t-big{font-family:'Sora';font-weight:700;font-size:clamp(36px,4.5vw,58px);line-height:1.1;letter-spacing:-2px}
+.t-med{font-family:'Sora';font-weight:600;font-size:clamp(20px,2.5vw,32px);line-height:1.3}
+.t-body{font-size:16px;color:var(--muted);line-height:1.7;max-width:700px}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ── GLOW TEXT ── */
+.glow-red{color:var(--red);text-shadow:0 0 40px rgba(255,62,62,0.4)}
+.glow-green{color:var(--green);text-shadow:0 0 40px rgba(0,255,136,0.4)}
+.glow-cyan{color:var(--cyan);text-shadow:0 0 40px rgba(0,212,255,0.4)}
+.glow-gold{color:var(--gold);text-shadow:0 0 40px rgba(255,215,0,0.4)}
+.glow-purple{color:var(--purple);text-shadow:0 0 40px rgba(168,85,247,0.4)}
+
+/* ── TAGS ── */
+.tag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;backdrop-filter:blur(10px)}
+
+/* ── GLASS CARDS ── */
+.glass{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;backdrop-filter:blur(20px);overflow:hidden}
+.glass-glow{box-shadow:0 0 30px rgba(59,130,246,0.08),inset 0 1px 0 rgba(255,255,255,0.05)}
+
+/* ── COUNTER ── */
+.counter-num{font-family:'JetBrains Mono';font-size:clamp(64px,10vw,120px);font-weight:700;line-height:1}
+
+/* ── FLOW ── */
+.flow{display:flex;align-items:center;gap:12px}
+.flow-node{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 24px;text-align:center;min-width:130px;position:relative}
+.flow-node::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;border-radius:1px}
+.flow-arrow{color:var(--dim);font-size:18px;opacity:0.5}
+.flow-icon{font-size:26px;margin-bottom:6px}
+.flow-label{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── FINDINGS GRID ── */
+.findings-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:820px}
+.finding{border-radius:14px;padding:22px 26px;position:relative;overflow:hidden}
+.finding::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.finding-amount{font-family:'JetBrains Mono';font-size:24px;font-weight:700}
+.finding-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.finding-detail{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.5;margin-top:6px}
+.finding-vehicles{font-family:'JetBrains Mono';font-size:10px;color:rgba(255,255,255,0.3);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)}
+
+/* ── CLASSIFIER ── */
+.class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:820px}
+.class-card{border-radius:14px;padding:28px 24px;text-align:center;position:relative;overflow:hidden}
+.class-card::before{content:'';position:absolute;inset:0;opacity:0.1;background:radial-gradient(circle at top,currentColor,transparent 70%)}
+.class-icon{font-size:40px;margin-bottom:12px}
+.class-title{font-weight:700;font-size:16px;margin-bottom:8px}
+.class-desc{font-size:12px;opacity:0.7;line-height:1.6}
+.class-route{margin-top:12px;padding:8px;border-radius:8px;background:rgba(0,0,0,0.3);font-size:11px;font-weight:600;letter-spacing:0.5px}
+.class-example{margin-top:8px;font-family:'JetBrains Mono';font-size:10px;opacity:0.4}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;gap:16px;width:100%;max-width:900px}
+.phase{flex:1;border-radius:14px;padding:22px;position:relative;overflow:hidden}
+.phase::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.phase-badge{font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;opacity:0.6;margin-bottom:6px;text-transform:uppercase}
+.phase-title{font-weight:700;font-size:17px;margin-bottom:10px}
+.phase-items{font-size:12px;opacity:0.75;line-height:2}
+.phase-target{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-family:'JetBrains Mono';font-size:13px;font-weight:600}
+
+/* ── EVIDENCE STRIP ── */
+.evidence-strip{display:flex;gap:14px;width:100%;max-width:860px;margin-top:16px}
+.ev-card{flex:1;background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px;font-size:12px}
+.ev-vehicle{font-weight:700;font-size:14px;margin-bottom:4px}
+.ev-stat{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);margin-top:6px;line-height:1.8}
+.ev-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:600;letter-spacing:0.5px}
+
+/* ── PULSE ── */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.7;transform:scale(1.02)}}
+.pulse{animation:pulse 2.5s ease-in-out infinite}
+
+/* ── SHIMMER ── */
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+.shimmer{background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);background-size:200% 100%;animation:shimmer 3s infinite}
+
+/* ── SCANNING LINE ── */
+@keyframes scanline{0%{top:-2px}100%{top:100%}}
+.scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0.5;animation:scanline 3s linear infinite}
+
+/* ── TYPING ── */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.cursor-blink{display:inline-block;width:2px;height:1em;background:var(--green);margin-left:2px;animation:blink 0.8s step-end infinite;vertical-align:text-bottom}
+
+/* ── FLOATING PARTICLES ── */
+.particle{position:fixed;width:2px;height:2px;background:var(--cyan);border-radius:50%;opacity:0;z-index:2;animation:particleFloat 6s ease-in-out infinite}
+@keyframes particleFloat{0%{opacity:0;transform:translateY(100vh)}50%{opacity:0.6}100%{opacity:0;transform:translateY(-100vh)}}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="cosmos"><canvas id="starfield"></canvas></div>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="grid-overlay"></div>
+
+<!-- Particles -->
+<div class="particle" style="left:10%;animation-delay:0s"></div>
+<div class="particle" style="left:25%;animation-delay:1s"></div>
+<div class="particle" style="left:40%;animation-delay:2s"></div>
+<div class="particle" style="left:55%;animation-delay:3s"></div>
+<div class="particle" style="left:70%;animation-delay:4s"></div>
+<div class="particle" style="left:85%;animation-delay:5s"></div>
+<div class="particle" style="left:15%;animation-delay:1.5s"></div>
+<div class="particle" style="left:60%;animation-delay:3.5s"></div>
+
+<!-- Progress -->
+<div class="progress-track"><div class="progress-fill" id="pBar"></div></div>
+<div class="slide-num"><span id="sNum">01</span> / <span id="sTotal">10</span></div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 1: TITLE                              -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide active" data-dur="5500">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(0,212,255,0.1);color:var(--cyan);border:1px solid rgba(0,212,255,0.2);margin-bottom:24px;">Geotab Vibe Coding Competition 2026</span>
+  </div>
+  <h1 class="t-hero reveal d1" style="text-align:center;margin-bottom:8px;">
+    <span style="background:linear-gradient(135deg,#fff 30%,var(--cyan) 60%,var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Fleet Cost</span><br>
+    <span style="background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Optimizer</span>
+  </h1>
+  <p class="reveal d2" style="font-family:'JetBrains Mono';font-size:12px;color:var(--dim);letter-spacing:3px;margin-bottom:20px">v2.0 — MyGeotab Add-In</p>
+  <p class="t-body reveal d3" style="text-align:center;margin-bottom:28px;">
+    One click. 30 seconds.<br>Tells your fleet manager exactly who to call, what to fix,<br>and by when — with dollar amounts attached.
+  </p>
+  <div class="reveal d4" style="display:flex;gap:10px;">
+    <span class="tag" style="background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.15)">Zero Infrastructure</span>
+    <span class="tag" style="background:rgba(168,85,247,0.08);color:var(--purple);border:1px solid rgba(168,85,247,0.15)">Single JSON File</span>
+    <span class="tag" style="background:rgba(255,140,0,0.08);color:var(--orange);border:1px solid rgba(255,140,0,0.15)">30-Second Audit</span>
+  </div>
+  <p class="reveal d5" style="margin-top:36px;font-size:12px;color:var(--dim)">Built by Sanjaya • February 2026</p>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 2: THE PROBLEM                        -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="6000">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(255,62,62,0.1);color:var(--red);border:1px solid rgba(255,62,62,0.2);margin-bottom:20px">The Problem</span>
+  </div>
+  <h2 class="t-big reveal d1" style="text-align:center;margin-bottom:16px;">
+    100+ reports.<br><span class="glow-red">Zero action plans.</span>
+  </h2>
+  <p class="t-body reveal d2" style="text-align:center;margin-bottom:36px;font-size:15px;">
+    MyGeotab tells you <em>what happened</em>. A fleet manager still has to open 5–6 reports,<br>
+    cross-reference manually, figure out what matters, decide who handles it,<br>
+    and somehow track if anything got done.
+  </p>
+  <div class="reveal d3" style="text-align:center">
+    <p style="font-size:12px;color:var(--dim);margin-bottom:10px;letter-spacing:1px">THE GAP COSTS</p>
+    <div class="counter-num glow-red" style="margin-bottom:6px">$<span id="ctr1">0</span></div>
+    <p class="mono" style="font-size:14px;color:var(--dim)">per month · 50-vehicle demo fleet</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 3: HOW IT WORKS                       -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="6500">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);margin-bottom:20px">How It Works</span>
+  </div>
+  <h2 class="t-big reveal d1" style="text-align:center;margin-bottom:28px;">
+    One click.<br><span class="glow-green">Prescriptive 90-day plan.</span>
+  </h2>
+  <div class="flow reveal d2">
+    <div class="flow-node" style="border-color:rgba(0,212,255,0.2)">
+      <div style="position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--cyan);border-radius:1px"></div>
+      <div class="flow-icon">📡</div><div style="font-weight:600;font-size:13px">5 API Calls</div>
+      <div class="flow-label">Trips · Faults · Exceptions<br>Devices · Diagnostics</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="border-color:rgba(168,85,247,0.2)">
+      <div style="position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--purple);border-radius:1px"></div>
+      <div class="flow-icon">🧠</div><div style="font-weight:600;font-size:13px">3-Way Classify</div>
+      <div class="flow-label">Mechanical · Device<br>· Driver Behavior</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="border-color:rgba(255,215,0,0.2)">
+      <div style="position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--gold);border-radius:1px"></div>
+      <div class="flow-icon">💰</div><div style="font-weight:600;font-size:13px">Price Every Finding</div>
+      <div class="flow-label">Dollar amounts<br>per vehicle per month</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="border-color:rgba(0,255,136,0.2)">
+      <div style="position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--green);border-radius:1px"></div>
+      <div class="flow-icon">📋</div><div style="font-weight:600;font-size:13px">Assign & Track</div>
+      <div class="flow-label">Who · What · When<br>How to measure</div>
+    </div>
+  </div>
+  <p class="reveal d3 mono" style="text-align:center;margin-top:24px;font-size:12px;color:var(--dim)">
+    No server · No API keys · No build step · Paste one JSON config
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 4: FINDINGS                           -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="7000">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(255,215,0,0.1);color:var(--gold);border:1px solid rgba(255,215,0,0.2);margin-bottom:16px">Demo Fleet Results</span>
+  </div>
+  <h2 class="t-big reveal d1" style="text-align:center;margin-bottom:8px;">
+    50 vehicles. 22 days.
+  </h2>
+  <p class="reveal d2 mono glow-gold" style="font-size:28px;font-weight:700;margin-bottom:24px">$10,843/month found.</p>
+
+  <div class="findings-grid">
+    <div class="finding glass reveal d3" style="border-left:3px solid var(--red)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),transparent)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="finding-title">🚫 Ghost Vehicles</div>
+        <div class="finding-amount glow-red">$8,800</div>
+      </div>
+      <div class="finding-detail">11 of 50 below 40% utilization — sitting in lots burning $800/mo lease each</div>
+      <div class="finding-vehicles">Demo-09 27% · Demo-42 27% · Demo-10 23% · Demo-22 36% · +7 more</div>
+    </div>
+    <div class="finding glass reveal d4" style="border-left:3px solid var(--orange)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--orange),transparent)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="finding-title">🔥 Idle Burn</div>
+        <div class="finding-amount" style="color:var(--orange)">$243</div>
+      </div>
+      <div class="finding-detail">Top 10 idlers — Demo-31 leads at 8.0 hrs. Peak: 21:00–00:00 (73% of idle)</div>
+      <div class="finding-vehicles">Demo-31 8.0h · Demo-15 7.9h · Demo-32 6.5h · Demo-33 6.2h · Demo-18 5.9h</div>
+    </div>
+    <div class="finding glass reveal d5" style="border-left:3px solid var(--gold)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="finding-title">⚡ High-Risk Driving</div>
+        <div class="finding-amount glow-gold">$1,000</div>
+      </div>
+      <div class="finding-detail">5 vehicles exceed 2× fleet safety avg. <b>4 device noise issues</b> — NOT engine faults</div>
+      <div class="finding-vehicles">Demo-39 6.2× · Demo-40 5.5× · Demo-41 4.9× · Demo-32 2.3× · Demo-19 2.3×</div>
+    </div>
+    <div class="finding glass reveal d6" style="border-left:3px solid var(--blue)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),transparent)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="finding-title">🔧 Breakdown Risk</div>
+        <div class="finding-amount" style="color:var(--blue)">$800</div>
+      </div>
+      <div class="finding-detail">1 vehicle with recurring fault codes. $400 inspection avoids $1,200–$3,500 roadside</div>
+      <div class="finding-vehicles">Demo-19 · Low Priority Warning Light ×4 · Single recurring code</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 5: 3-WAY CLASSIFIER                   -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="7000">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(168,85,247,0.1);color:var(--purple);border:1px solid rgba(168,85,247,0.2);margin-bottom:16px">Key Breakthrough</span>
+  </div>
+  <h2 class="t-big reveal d1" style="text-align:center;margin-bottom:8px">
+    <span class="glow-purple">3-Way Fault Classifier</span>
+  </h2>
+  <p class="t-body reveal d2" style="text-align:center;font-size:14px;margin-bottom:20px">
+    Cross-validation found 3 vehicles misclassified as mechanical failures —<br>
+    actually accelerometer mounting issues. Wrong classification sends a mechanic for a firmware problem.
+  </p>
+  <div class="class-grid">
+    <div class="class-card reveal d3" style="background:linear-gradient(160deg,#1a0505,#2d0a0a);color:#fca5a5;border:1px solid rgba(255,62,62,0.15)">
+      <div class="class-icon">🔧</div>
+      <div class="class-title">Mechanical</div>
+      <div class="class-desc">Real engine DTCs from FaultData API. Recurring codes = component failure.</div>
+      <div class="class-route" style="background:rgba(255,62,62,0.1)">→ SEND TO MECHANIC</div>
+      <div class="class-example">Demo-32: Low Priority Warning Light ×2<br>Demo-19: Low Priority Warning Light ×4</div>
+    </div>
+    <div class="class-card reveal d4" style="background:linear-gradient(160deg,#0d0520,#1a0a3a);color:#c4b5fd;border:1px solid rgba(168,85,247,0.15)">
+      <div class="class-icon">📱</div>
+      <div class="class-title">Device Noise</div>
+      <div class="class-desc">Accelerometer triggers from loose Geotab GO device. Looks like faults — isn't.</div>
+      <div class="class-route" style="background:rgba(168,85,247,0.1)">→ SEND TO IT / GEOTAB</div>
+      <div class="class-example">Demo-39: 15 Engine Fault Exceptions<br>Demo-40, 41, 42: all accelerometer</div>
+    </div>
+    <div class="class-card reveal d5" style="background:linear-gradient(160deg,#0a0d02,#1a2005);color:#fde68a;border:1px solid rgba(255,215,0,0.15)">
+      <div class="class-icon">👤</div>
+      <div class="class-title">Driver Behavior</div>
+      <div class="class-desc">Speeding, hard braking, cornering from ExceptionEvent rules.</div>
+      <div class="class-route" style="background:rgba(255,215,0,0.1)">→ COACHING SESSION</div>
+      <div class="class-example">Speeding · Harsh Cornering<br>Hard Acceleration events</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 6: EVIDENCE DEPTH                     -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="7000">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(0,212,255,0.1);color:var(--cyan);border:1px solid rgba(0,212,255,0.2);margin-bottom:16px">Evidence-Backed</span>
+  </div>
+  <h2 class="t-big reveal d1" style="text-align:center;margin-bottom:8px">
+    Every finding has <span class="glow-cyan">proof.</span>
+  </h2>
+  <p class="t-body reveal d2" style="text-align:center;font-size:14px;margin-bottom:20px">
+    Not just "Demo-31 idles too much" — the tool shows <em>when</em>, <em>how long</em>, and <em>the pattern</em>.
+  </p>
+  <div class="evidence-strip reveal d3">
+    <div class="ev-card" style="border-left:3px solid var(--orange)">
+      <div class="ev-vehicle">🔥 Demo-31 — Top Idler</div>
+      <div style="font-size:12px;color:var(--muted)">8.0 hrs idle · ~$34/mo</div>
+      <div class="ev-stat">
+        Peak <span style="color:var(--orange);font-weight:600">21:00–00:00</span> (73%)<br>
+        190 trips analyzed<br>
+        🌙 Evening pattern — engine-off policy needed<br>
+        <span style="color:var(--dim)">Feb 18: 45m (96% of trip)</span><br>
+        <span style="color:var(--dim)">Feb 13: 30m (68% of trip)</span>
+      </div>
+    </div>
+    <div class="ev-card" style="border-left:3px solid var(--purple)">
+      <div class="ev-vehicle">📱 Demo-39 — Device Noise</div>
+      <div style="font-size:12px;color:var(--muted)">19 events · 6.2× fleet avg</div>
+      <div class="ev-stat">
+        <span class="ev-tag" style="background:rgba(168,85,247,0.2);color:var(--purple)">DEVICE ISSUE</span><br>
+        Engine Fault Exception: <b>15</b><br>
+        Hard Acceleration: 1 · Cornering: 1<br>
+        <span style="color:var(--dim)">Feb 22 05:12 — 27m</span><br>
+        <span style="color:var(--dim)">Feb 21 05:06 — 38m</span><br>
+        <span style="color:var(--dim)">Feb 21 02:56 — 2h 2m</span>
+      </div>
+    </div>
+    <div class="ev-card" style="border-left:3px solid var(--red)">
+      <div class="ev-vehicle">🔧 Demo-19 — Mechanical</div>
+      <div style="font-size:12px;color:var(--muted)">4 recurring faults</div>
+      <div class="ev-stat">
+        <span class="ev-tag" style="background:rgba(255,62,62,0.2);color:var(--red)">NEEDS MECHANIC</span><br>
+        Low Priority Warning Light <b>×4</b><br>
+        Single recurring code<br>
+        <span style="color:var(--dim)">Engine Light On: 3</span><br>
+        <span style="color:var(--dim)">Engine Fault Exception: 3</span><br>
+        <span style="color:var(--dim)">$400 inspect → avoid $3,500</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 7: 90-DAY ROADMAP                     -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="7000">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);margin-bottom:16px">Prescriptive Output</span>
+  </div>
+  <h2 class="t-big reveal d1" style="text-align:center;margin-bottom:24px">
+    <span class="glow-green">90-Day Roadmap</span>
+  </h2>
+  <div class="timeline">
+    <div class="phase reveal d2" style="background:linear-gradient(160deg,#021a0a,#05250f);border:1px solid rgba(0,255,136,0.1)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--green)"></div>
+      <div class="phase-badge">Days 1–30</div>
+      <div class="phase-title">Quick Wins</div>
+      <div class="phase-items">
+        ⚠️ Urgent: Demo-32, Demo-19 diagnostics<br>
+        📱 Device check: Demo-39, 40, 41, 42<br>
+        📋 Anti-idle policy (3 min max)<br>
+        🔌 Block heater quotes: top 3 idlers<br>
+        📊 Weekly MyGeotab reports set up
+      </div>
+      <div class="phase-target" style="color:var(--green)">$10,843 → $9,970</div>
+    </div>
+    <div class="phase reveal d3" style="background:linear-gradient(160deg,#020a1a,#051530);border:1px solid rgba(59,130,246,0.1)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue)"></div>
+      <div class="phase-badge">Days 31–60</div>
+      <div class="phase-title">Measure & Adjust</div>
+      <div class="phase-items">
+        🔄 Re-run audit — compare side-by-side<br>
+        📈 Driver scorecards (before/after)<br>
+        🔌 Block heaters installed<br>
+        👻 Ghost review: Keep / Share / Remove<br>
+        💰 Actual $ saved vs baseline
+      </div>
+      <div class="phase-target" style="color:var(--blue)">$5,421 (50% ↓)</div>
+    </div>
+    <div class="phase reveal d4" style="background:linear-gradient(160deg,#0d0520,#150a30);border:1px solid rgba(168,85,247,0.1)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--purple)"></div>
+      <div class="phase-badge">Days 61–90</div>
+      <div class="phase-title">Systematize</div>
+      <div class="phase-items">
+        🔄 Third audit — 3 data points for trend<br>
+        🌱 Spring baseline (seasonal comparison)<br>
+        📋 Fleet right-sizing decisions<br>
+        📋 SOPs in operations manual<br>
+        📊 ESG report ready for filings
+      </div>
+      <div class="phase-target" style="color:var(--purple)">$3,795 (65% ↓)</div>
+    </div>
+  </div>
+  <p class="reveal d5 mono" style="text-align:center;margin-top:16px;font-size:11px;color:var(--dim)">
+    Annual savings at 90d: $84,575 + 9.8t CO₂ reduction
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 8: SUSTAINABILITY                     -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="6500">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);margin-bottom:16px">🌱 Sustainability & ESG</span>
+  </div>
+  <h2 class="t-big reveal d1" style="text-align:center;margin-bottom:20px">
+    Carbon impact <span class="glow-green">quantified.</span>
+  </h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;width:100%;max-width:780px">
+    <div class="glass glass-glow reveal d2" style="padding:24px;text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">⛽</div>
+      <div class="mono" style="font-size:28px;font-weight:700;color:var(--orange)">8,451 L</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Annual idle fuel burned</div>
+      <div class="mono" style="font-size:13px;color:var(--green);margin-top:8px">→ 2,958 L at 65% target</div>
+    </div>
+    <div class="glass glass-glow reveal d3" style="padding:24px;text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">🌍</div>
+      <div class="mono" style="font-size:28px;font-weight:700;color:var(--red)">22.6 t</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Annual CO₂ from idle</div>
+      <div class="mono" style="font-size:13px;color:var(--green);margin-top:8px">→ 7.9 t at 65% target</div>
+    </div>
+    <div class="glass glass-glow reveal d4" style="padding:24px;text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">🌳</div>
+      <div class="mono" style="font-size:28px;font-weight:700;color:var(--green)">669</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Trees equivalent saved</div>
+      <div class="mono" style="font-size:13px;color:var(--green);margin-top:8px">at 65% idle reduction</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;margin-top:20px;width:100%;max-width:780px">
+    <div class="glass reveal d5" style="flex:1;padding:16px;font-size:12px;border-left:3px solid var(--cyan)">
+      <b style="color:var(--cyan)">Clean Fuel Regs</b><br><span style="color:var(--muted)">SOR/2022-140 — suppliers pass $0.04–0.06/L. Less fuel = direct savings.</span>
+    </div>
+    <div class="glass reveal d6" style="flex:1;padding:16px;font-size:12px;border-left:3px solid var(--purple)">
+      <b style="color:var(--purple)">ISSB S2 Disclosure</b><br><span style="color:var(--muted)">CSA adopting mandatory climate reporting. Scope 1 fleet emissions data ready.</span>
+    </div>
+    <div class="glass reveal d7" style="flex:1;padding:16px;font-size:12px;border-left:3px solid var(--green)">
+      <b style="color:var(--green)">Gov Contracts</b><br><span style="color:var(--muted)">Federal & municipal RFPs require ESG metrics. Fleet data = procurement advantage.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 9: SEASONAL + FLEET OVERVIEW          -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="6500">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(0,212,255,0.1);color:var(--cyan);border:1px solid rgba(0,212,255,0.2);margin-bottom:16px">Fleet Intelligence</span>
+  </div>
+  <h2 class="t-big reveal d1" style="text-align:center;margin-bottom:20px">
+    Seasonal awareness. <span class="glow-cyan">Data maturity.</span>
+  </h2>
+  <div style="display:flex;gap:20px;width:100%;max-width:860px">
+    <div class="glass glass-glow reveal d2" style="flex:1;padding:22px">
+      <div style="font-weight:700;font-size:15px;margin-bottom:12px">📊 Fleet Utilization Distribution</div>
+      <div style="font-family:'JetBrains Mono';font-size:12px;line-height:2.2">
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--red)">0–25%</span><div style="width:20px;height:12px;background:var(--red);border-radius:2px"></div> 1 vehicle</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--orange)">25–50%</span><div style="width:130px;height:12px;background:var(--orange);border-radius:2px"></div> 13 vehicles</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--gold)">50–75%</span><div style="width:200px;height:12px;background:var(--gold);border-radius:2px"></div> 21 vehicles</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--green)">75–100%</span><div style="width:150px;height:12px;background:var(--green);border-radius:2px"></div> 15 vehicles</div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--dim)">50 units · 22 days · 6,006 trips</div>
+    </div>
+    <div class="glass glass-glow reveal d3" style="flex:1;padding:22px">
+      <div style="font-weight:700;font-size:15px;margin-bottom:12px">📈 Monthly Idle Trend</div>
+      <div style="display:flex;align-items:flex-end;height:100px;gap:24px;padding:0 20px;margin-bottom:12px">
+        <div style="flex:1;text-align:center">
+          <div class="mono" style="font-size:10px;color:var(--muted);margin-bottom:4px">4h</div>
+          <div style="height:3px;background:var(--blue);border-radius:2px 2px 0 0"></div>
+          <div style="font-size:10px;color:var(--dim);margin-top:6px">Jan 26</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div class="mono" style="font-size:10px;color:var(--muted);margin-bottom:4px">141h</div>
+          <div style="height:90px;background:var(--blue);border-radius:2px 2px 0 0"></div>
+          <div style="font-size:10px;color:var(--dim);margin-top:6px">Feb 26</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--dim);border-top:1px solid rgba(255,255,255,0.06);padding-top:10px">
+        ❄️ Winter · ☀️ Summer — Re-run quarterly for seasonal baseline.<br>
+        Schedule next audit: May 23, 2026
+      </div>
+    </div>
+  </div>
+  <div class="glass reveal d4" style="margin-top:14px;padding:14px 20px;max-width:860px;width:100%;font-size:12px;color:var(--muted);border-left:3px solid var(--gold)">
+    <b style="color:var(--gold)">⚠️ Data Maturity:</b> Tool requested 365 days — database contains 22 days. Projections based on available data. 6+ months needed for reliable seasonal patterns. Each re-run strengthens confidence.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 10: CLOSING                           -->
+<!-- ════════════════════════════════════════════ -->
+<div class="slide" data-dur="8000">
+  <div class="reveal d0">
+    <span class="tag" style="background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);margin-bottom:24px">Get Started</span>
+  </div>
+  <h1 class="t-hero reveal d1" style="text-align:center;margin-bottom:6px">
+    <span style="background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Paste. Click.</span>
+  </h1>
+  <h1 class="t-hero reveal d2" style="text-align:center;margin-bottom:24px">
+    <span style="background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Done.</span>
+  </h1>
+  <div class="glass glass-glow reveal d3" style="padding:28px 40px;max-width:550px;width:100%;margin-bottom:24px;position:relative;overflow:hidden">
+    <div class="scanline"></div>
+    <div class="mono" style="font-size:13px;line-height:2.4;color:var(--muted)">
+      <span style="color:var(--dim)">1.</span> MyGeotab → Admin → Add-Ins<br>
+      <span style="color:var(--dim)">2.</span> Paste <span style="color:var(--cyan)">fleet-cost-optimizer-v2.0.json</span><br>
+      <span style="color:var(--dim)">3.</span> Click <span style="color:var(--green);font-weight:700">Run Audit</span><br>
+      <span style="color:var(--dim)">4.</span> <span style="color:var(--green)">30 seconds → your 90-day plan</span><span class="cursor-blink"></span>
+    </div>
+  </div>
+  <p class="reveal d4" style="text-align:center;font-size:14px;color:var(--muted);margin-bottom:28px">
+    No server. No API keys. No build step.<br>
+    Entire UI embedded inside a single JSON config — HTML, CSS, JavaScript, everything.
+  </p>
+  <div class="reveal d5" style="display:flex;gap:12px">
+    <div class="glass" style="padding:10px 18px;font-size:12px;color:var(--muted)">🏗️ Built with Gemini + Claude</div>
+    <div class="glass" style="padding:10px 18px;font-size:12px;color:var(--muted)">📦 49,393 bytes (607 bytes headroom)</div>
+  </div>
+  <p class="reveal d6 mono" style="margin-top:28px;font-size:11px;color:var(--dim);letter-spacing:2px">
+    FLEET COST OPTIMIZER v2.0 · GEOTAB VIBE CODING COMPETITION 2026
+  </p>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="cb" onclick="nav(-1)">← Prev</button>
+  <button class="cb on" id="playBtn" onclick="togglePlay()">⏸ Auto</button>
+  <button class="cb" onclick="nav(1)">Next →</button>
+</div>
+
+<script>
+// Starfield
+(function(){
+var c=document.getElementById('starfield'),x=c.getContext('2d');
+c.width=window.innerWidth;c.height=window.innerHeight;
+var stars=[];for(var i=0;i<150;i++)stars.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.2+0.3,s:Math.random()*0.3+0.1,o:Math.random()});
+function draw(){x.clearRect(0,0,c.width,c.height);
+stars.forEach(function(s){s.o+=s.s*0.02;if(s.o>1)s.o=0;
+x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fillStyle='rgba(200,220,255,'+Math.abs(Math.sin(s.o*Math.PI))*0.6+')';x.fill()});
+requestAnimationFrame(draw)}draw();
+window.addEventListener('resize',function(){c.width=window.innerWidth;c.height=window.innerHeight})})();
+
+// Slides
+var slides=document.querySelectorAll('.slide'),cur=0,playing=true,tmr=null,tot=slides.length;
+document.getElementById('sTotal').textContent=('0'+tot).slice(-2);
+
+function show(i){slides.forEach(function(s){s.classList.remove('active')});
+slides[i].classList.add('active');cur=i;
+document.getElementById('sNum').textContent=('0'+(i+1)).slice(-2);
+document.getElementById('pBar').style.width=((i+1)/tot*100)+'%';
+if(i===1)animCtr('ctr1',0,10843,1800)}
+
+function nav(d){var n=cur+d;if(n<0)n=tot-1;if(n>=tot)n=0;show(n);if(playing)autoNext()}
+
+function autoNext(){clearTimeout(tmr);var d=parseInt(slides[cur].getAttribute('data-dur'))||6000;
+tmr=setTimeout(function(){if(cur<tot-1){show(cur+1);autoNext()}else{playing=false;upBtn()}},d)}
+
+function togglePlay(){playing=!playing;upBtn();if(playing)autoNext();else clearTimeout(tmr)}
+function upBtn(){var b=document.getElementById('playBtn');b.textContent=playing?'⏸ Auto':'▶ Play';b.className=playing?'cb on':'cb'}
+
+function animCtr(id,s,e,dur){var el=document.getElementById(id);if(!el)return;var st=null;
+function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1),ease=1-Math.pow(1-p,3);
+el.textContent=Math.round(s+(e-s)*ease).toLocaleString();if(p<1)requestAnimationFrame(step)}
+requestAnimationFrame(step)}
+
+document.addEventListener('keydown',function(e){
+if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nav(1)}
+if(e.key==='ArrowLeft'){e.preventDefault();nav(-1)}
+if(e.key==='p')togglePlay()});
+
+show(0);autoNext();
+</script>
+</body>
+</html>
