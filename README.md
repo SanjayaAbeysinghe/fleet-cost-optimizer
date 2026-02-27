@@ -171,9 +171,9 @@ Demo-39: 19 events, wall-to-wall Engine Fault Exception at 2-5 AM, tagged "Devic
 
 ---
 
-## Future Roadmap
+## Future Roadmap (What could make this a better product) 
 
-What I'd build next:
+## Future Roadmap
 
 **Split classification on action cards.** Replace the binary "Mechanical, NOT driver behavior" with "4 of 7 mechanical, 3 of 7 behavioral. Primary: mechanic. Secondary: coaching."
 
@@ -183,13 +183,20 @@ What I'd build next:
 
 **Configurable cost inputs.** A settings panel where you enter your actual lease rate, hourly shop rate, and fuel price. Three fields and every dollar amount in the report becomes real.
 
+**Camera-correlated coaching optimization.** Geotab integrates with camera providers like Surfsight that capture video clips triggered by safety events — hard braking, collisions, speeding, distracted driving. Right now the tool flags behavioral events based on exception counts alone: "Demo-15 has 12 harsh braking events, 3× fleet average." That tells you there's a pattern but not why. A driver who hard-brakes 12 times avoiding pedestrians in a downtown delivery route is a different problem than one tailgating on a highway.
+
+Camera footage closes that gap. Cross-referencing exception events with timestamped video clips would let the tool classify behavioral flags into camera-verified (footage confirms risky behavior — coaching priority) vs. context-justified (footage shows defensive driving or road conditions — downgrade or dismiss). The same logic that prevents sending a mechanic for a firmware problem now prevents sending a safety coach for a driver who's actually handling a tough route well.
+
+The coaching cards in the action plan would change too. Instead of generic "one-on-one conversation, target -50% events in 30d," each card could reference specific clips: "3 of 12 harsh braking events confirmed as following-distance issues (Feb 12, 15, 19 — clips attached). Focus coaching on highway spacing. Remaining 9 events show intersection stops in the downtown core — no action needed." That turns a vague conversation into a 5-minute review with video evidence both the driver and the safety lead can see.
+
+At fleet scale, camera correlation also surfaces route-level problems. If 4 drivers on the same route all trigger harsh braking at the same intersection, that's not a driver issue — it's a road design or route planning issue. The tool could flag "intersection pattern detected" and route it to operations instead of safety. Same classification logic, one more data source.
+
 **Ace API chat panel.** A conversational interface where a fleet manager asks "which vehicles should I look at first?" and gets a prioritized answer. Attempted 11 times during development — failed every time due to the 50KB Add-In size constraint. The Ace SDK alone would push past the limit. Would need a server-side architecture change to make this work.
 
 **N8N workflow integration.** The audit already organizes findings by role — maintenance coordinator, IT, fleet manager. N8N could route those findings directly to the right person. URGENT mechanical flags go to the maintenance coordinator's inbox immediately. Device noise tickets go to IT. The fleet manager gets a weekly digest with cost trends and roadmap progress. Escalation triggers fire automatically — if idle hours haven't dropped 20% by Day 30, the fleet manager gets a nudge before it stalls. The audit data is already structured for this; it just needs a webhook endpoint and an N8N flow to distribute it.
 
 **Suppress annual estimate under 60 days.** Show it only after 2+ quarterly runs, with a confidence range instead of a point estimate.
 
----
 
 ## Challenges Faced
 
